@@ -1,0 +1,32 @@
+# Mengabaikan berkas sensitif API Key
+config.json
+
+# Mengabaikan folder dataset gambar latih (agar ukuran upload sangat ringan)
+/daun buah merah/
+/daun gatal/
+/daun gedi/
+/sarang semut/
+
+# Mengabaikan folder bab bimbingan skripsi & dokumen docx/pdf
+/bab 1/
+/bab 2/
+*.docx
+*.pdf
+*.bat
+*.txt
+
+# Mengabaikan model Keras asli (Render hanya perlu model tfjs di folder app/model)
+*.keras
+
+# Mengabaikan berkas executable local
+ngrok.exe
+
+# Mengabaikan modul node.js & cache
+node_modules/
+package-lock.json
+__pycache__/
+*.log
+
+# Mengabaikan OS metadata
+.DS_Store
+Thumbs.db

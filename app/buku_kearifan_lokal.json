@@ -1,0 +1,31 @@
+{
+  "daun_gatal": {
+    "nama_ilmiah": "Laportea ducumana (Roxb.) Wedd.",
+    "famili": "Urticaceae",
+    "nama_lokal": "Daun gatal (sebutan lokal seluruh Papua), Ponim, Towo (Lanny)",
+    "nama_lain": "Stinging tree (Inggris)",
+    "deskripsi": "Merupakan tumbuhan herbal musiman, monoecious, berupa semak tinggi 1.5 m. Batang berkayu, kayu lunak, kaku dan mudah pecah. Mengandung trikoma yang bersifat iritan, khususnya pada bagian pucuk. Helaian daun panjang 20-25 cm lebar 6-18 cm, bangun daun oval/jorong kasar berkerut-kerut dengan trikoma iritan padat pada kedua permukaan (terutama bagian bawah).",
+    "penggunaan_tradisional": "Daun digunakan secara eksternal untuk meringankan nyeri badan, capek pegal-pegal, sakit kepala, sakit perut, nyeri persendian tulang, dan memar. Daun dengan sisi permukaan bawah ditempelkan/ditepukkan pada bagian yang nyeri. Digosokkan pada dada untuk mengatasi asma. Bagi penderita malaria, daun gatal dipukul-pukulkan pada seluruh badan agar berkeringat dan hangat sehingga meringankan demam malaria.",
+    "kandungan_kimia": "Mengandung senyawa kimia golongan alkaloid, glikosida, triterpenoid, dan asam formiat."
+  },
+  "sarang_semut": {
+    "nama_ilmiah": "Myrmecodia spp.",
+    "famili": "Rubiaceae",
+    "nama_lokal": "Sarang Semut",
+    "nama_lain": "ant-like or full of ants",
+    "deskripsi": "Merupakan perdu dan bersifat epifit yang bentuknya mirip umbi, memiliki batang tebal, tidak bercabang, terbungkus klipeoli dan alveoli yang memiliki duri. Daun tunggal berbentuk jorong dengan panjang 35 cm, bertangkai tersusun menyebar berkumpul di ujung batang. Helaian daun tebal dengan ujung tumpul.",
+    "cara_pemanfaatan": "Umbi diiris melintang atau diserbuk, direbus dengan air lalu disaring dan diminum airnya.",
+    "kegunaan": "Untuk menyembuhkan berbagai penyakit seperti radang (antiinflamasi), mengatasi nyeri otot, kanker, tumor, dan diabetes.",
+    "kandungan_kimia": "Mengandung flavonoid, tanin, tokoferol, fenolik, dan berbagai mineral (Natrium, kalsium, seng, besi, fosfor, magnesium) sebagai antiinflamasi, antioksidan, dan antikanker. Mencegah tulang keropos (osteoporosis) dan dapat digunakan sebagai antibiotik."
+  },
+  "buah_merah": {
+    "nama_ilmiah": "Pandanus conoideus Lam.",
+    "famili": "Pandanaceae",
+    "nama_lokal": "Buah merah Papua",
+    "nama_lain": "Red fruit (Inggris), Kuamsu (Wamena)",
+    "deskripsi": "Tumbuhan keluarga pandan-pandanan berupa pohon setinggi 16 m ditopang akar tunjang. Buah berbentuk lonjong merah mencolok (ada yang kuning/coklat), panjang sampai 55 cm, diameter 10-15 cm, bobot 2-3 kg.",
+    "penggunaan_tradisional": "Untuk menjaga stamina dan kebugaran tubuh. Masyarakat lokal mencampurkan buah merah ke sayur atau daging yang dimasak. Sekarang diolah secara modern diambil minyaknya (dalam kemasan botol atau soft kapsul).",
+    "kandungan_kimia": "Mengandung karoten 12000 ppm, betakaroten 700 ppm, tokoferol 11000 ppm, asam oleat, asam linoleat, asam linolenat, dekanoat, omega 3, omega 9, Kalsium 54000 mg per 100g buah segar, Vitamin A, Vitamin E, dan energi tinggi 360 kalori.",
+    "aktivitas_farmakologi": "Antioksidan, mencegah sel kanker dan tumor, meningkatkan stamina tubuh, mengencerkan darah, menurunkan darah tinggi (hipertensi), mencegah stroke, anti asam urat, anti osteoporosis, meningkatkan libido, kesuburan, mengobati gangguan mata, dan meningkatkan kekebalan tubuh (termasuk meringankan penderita HIV/AIDS)."
+  }
+}

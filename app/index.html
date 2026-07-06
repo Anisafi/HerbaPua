@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HerbaPua - Klasifikasi Tanaman Herbal</title>
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- SVG Gradients Definition for accuracy ring -->
+  <svg width="0" height="0" style="position: absolute;">
+    <defs>
+      <linearGradient id="primary-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#0d9488" />
+        <stop offset="100%" stop-color="#0ea5e9" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-title-container">
+        <svg class="header-logo" viewBox="0 0 24 24" width="40" height="40" style="filter: drop-shadow(0 2px 6px rgba(13, 148, 136, 0.2));">
+          <path fill="url(#primary-gradient)" d="M17,8C8,10 5.9,16.17 3.82,21.34L2.66,20.18C7.83,18.1 14,16 16,7C17.15,6.3 18.25,5.4 19.25,4.35C19.78,3.8 20.35,3.2 20.85,2.56L21.44,3.15C20.8,3.65 20.2,4.22 19.65,4.75C18.6,5.75 17.7,6.85 17,8M16,7C13.5,8.25 11,9.5 8.5,10.75C8.5,12 8.75,13.25 9.25,14.5C11.5,12 13.75,9.5 16,7Z" />
+        </svg>
+        <div class="header-text">
+          <h1>HerbaPua</h1>
+        </div>
+      </div>
+      
+      <!-- Desktop Navigation Menu (Visible only on Desktop) -->
+      <nav class="desktop-nav">
+        <div class="desktop-nav-item active" data-page="home">
+          <i class="fa-solid fa-house"></i> Beranda
+        </div>
+        <div class="desktop-nav-item" data-page="camera">
+          <i class="fa-solid fa-expand"></i> Pindai
+        </div>
+      </nav>
+      
+      <div class="header-actions">
+        <button class="info-btn" id="open-about-btn" title="Tentang Aplikasi">
+          <i class="fa-solid fa-circle-info"></i>
+        </button>
+      </div>
+    </header>
+
+
+    <!-- Main Content Container -->
+    <main class="app-content" id="app-main-content">
+      
+      <!-- 1. PAGE: HOME -->
+      <section id="page-home" class="page active">
+        <div class="hero-card">
+          <div class="hero-content">
+            <h2>Digitalisasi Herbal Papua</h2>
+            <p style="color: rgba(255, 255, 255, 0.85); font-size: 0.82rem; margin-top: 6px; line-height: 1.4; max-width: 80%;">
+              Sistem klasifikasi mandiri tanaman obat & ensiklopedia kearifan lokal Suku Adat Papua Barat Daya.
+            </p>
+          </div>
+          <i class="fa-solid fa-leaf hero-leaf-icon"></i>
+        </div>
+        
+        <h3 class="section-title">Tanaman Target Klasifikasi</h3>
+        <div class="plant-grid" id="plant-grid-container">
+          <!-- Diisi otomatis oleh JavaScript -->
+        </div>
+
+        <!-- Chatbot Section (Konsultasi PapuaBot) -->
+        <div class="chat-section-wrapper" style="margin-top: 40px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <h3 class="section-title" style="margin-bottom: 0;">Konsultasi PapuaBot 🍃</h3>
+            <button class="chat-header-reset-btn" id="chat-header-reset-btn" title="Mulai Ulang Percakapan">
+              <i class="fa-solid fa-arrows-rotate"></i> Mulai Ulang
+            </button>
+          </div>
+          <p class="section-subtitle">Tanyakan khasiat obat tradisional, dosis, cara pengolahan, atau unggah foto daun tanaman</p>
+          
+          <div class="chat-container" style="max-width: 100%; border-radius: 20px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04); border: 1px solid var(--glass-border); margin-top: 15px;">
+            <!-- Chat Bubbles Area -->
+            <div class="chat-messages" id="chat-messages-container">
+              <!-- Pesan Sambutan Bot -->
+            </div>
+            
+            <!-- Reply Chips -->
+            <div class="chat-chips">
+              <div class="chat-chip" onclick="sendQuickReply('Apa khasiat Daun Buah Merah?')">Khasiat Buah Merah</div>
+              <div class="chat-chip" onclick="sendQuickReply('Bagaimana cara mengolah Sarang Semut?')">Cara Olah Sarang Semut</div>
+              <div class="chat-chip" onclick="sendQuickReply('Apa manfaat Daun Gatal?')">Manfaat Daun Gatal</div>
+              <div class="chat-chip" onclick="sendQuickReply('Bagaimana cara mengonsumsi Daun Gedi?')">Konsumsi Daun Gedi</div>
+            </div>
+            
+            <!-- Preview File Terlampir -->
+            <div class="file-preview-container" id="chat-file-preview">
+              <img class="file-preview-img" id="chat-preview-img" src="" alt="preview">
+              <span class="file-preview-name" id="chat-preview-name">file_name.jpg</span>
+              <i class="fa-solid fa-xmark file-preview-close" id="chat-preview-clear"></i>
+            </div>
+            
+            <!-- Chat Input Bar -->
+            <div class="chat-input-bar">
+              <button class="chat-btn-attach" id="chat-attach-btn" title="Kirim Foto untuk Klasifikasi">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+              <input type="text" id="chat-input" placeholder="Tanyakan seputar tanaman herbal...">
+              <button class="chat-btn-send" id="chat-send-btn" title="Kirim">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+              <!-- Input File Tersembunyi untuk Chat -->
+              <input type="file" id="chat-file-input" accept="image/*" style="display:none;">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="app-footer">
+          <div class="footer-divider"></div>
+          <div class="footer-content">
+            <h3>HerbaPua</h3>
+            <p>Digitalisasi Tanaman Herbal Papua Barat Daya</p>
+            <p class="footer-copyright">&copy; 2026 Universitas Muhammadiyah Sorong</p>
+          </div>
+        </footer>
+      </section>
+
+      <!-- 2. PAGE: CAMERA / LIVE CLASSIFICATION -->
+      <section id="page-camera" class="page">
+        <div class="camera-section">
+          
+          <div class="camera-left-panel">
+            <div class="camera-viewport" id="camera-viewport">
+              
+              <!-- Video tag untuk stream kamera -->
+              <video id="camera-stream" autoplay playsinline></video>
+              
+              <!-- Canvas Tersembunyi untuk Capture Image -->
+              <canvas id="capture-canvas" style="display:none;"></canvas>
+              
+              <!-- Frame Target Focus & Grid Laser -->
+              <div class="camera-overlay" id="camera-overlay">
+                <div class="camera-bracket">
+                  <span></span>
+                </div>
+                <div class="scanner-line"></div>
+              </div>
+              
+              <!-- Status REC / Live -->
+              <div class="live-indicator">
+                <div class="live-dot"></div>
+                <span id="camera-status-text">CAMERA LIVE</span>
+              </div>
+              
+              <!-- Loading Overlay saat memproses CNN -->
+              <div class="loading-overlay" id="loading-overlay">
+                <div class="loading-spinner"></div>
+                <p id="loading-status">MEMPROSES CITRA...</p>
+                <span id="loading-substatus">MobileNetV2 Feed Forward</span>
+              </div>
+            </div>
+            
+            <!-- Tombol Kontrol Kamera -->
+            <div class="camera-controls">
+              <button class="btn-capture" id="capture-btn" title="Ambil Foto & Klasifikasi">
+                <i class="fa-solid fa-expand"></i>
+              </button>
+              <button class="btn-circle" id="upload-file-btn" title="Unggah File Gambar">
+                <i class="fa-solid fa-image"></i>
+              </button>
+              <!-- Input File Tersembunyi -->
+              <input type="file" id="image-file-input" accept="image/*" style="display:none;">
+            </div>
+          </div>
+          
+          <!-- Section Hasil Klasifikasi -->
+          <div class="result-section" id="result-section">
+            <div class="result-card">
+              <div class="result-header">
+                <div class="result-title-group">
+                  <h3 id="res-plant-name">Daun Gatal</h3>
+                  <p id="res-plant-latin">Laportea decumana</p>
+                </div>
+                
+                <!-- Circular accuracy gauge -->
+                <div class="result-accuracy-container">
+                  <div class="accuracy-ring-wrapper">
+                    <svg class="accuracy-ring" width="80" height="80">
+                      <circle class="accuracy-ring-bg" cx="40" cy="40" r="32"></circle>
+                      <circle class="accuracy-ring-progress" id="res-accuracy-ring" cx="40" cy="40" r="32"></circle>
+                    </svg>
+                    <div class="accuracy-text-center">
+                      <span id="res-accuracy-val">98.4%</span>
+                      <span class="accuracy-lbl">Akurasi</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="result-tabs">
+                <div class="result-tab active" data-tab="res-tab-desc">Deskripsi</div>
+                <div class="result-tab" data-tab="res-tab-benefits">Khasiat</div>
+                <div class="result-tab" data-tab="res-tab-usage">Pengolahan</div>
+              </div>
+              
+              <div class="result-tab-content active" id="res-tab-desc">
+                <!-- Deskripsi -->
+              </div>
+              <div class="result-tab-content" id="res-tab-benefits">
+                <!-- Khasiat -->
+              </div>
+              <div class="result-tab-content" id="res-tab-usage">
+                <!-- Pengolahan -->
+              </div>
+              
+              <!-- Safety Notice / Disclaimer -->
+              <div class="result-safety-notice" id="result-safety-notice"></div>
+            </div>
+            
+            <button class="btn-reset-scan" id="btn-reset-scan">
+              <i class="fa-solid fa-arrows-rotate"></i> Ulangi Pindai
+            </button>
+          </div>
+          
+        </div>
+      </section>
+    </main>
+
+    <!-- Bottom Navigation Bar (Visible only on Mobile) -->
+    <nav class="bottom-nav">
+      <div class="nav-item active" data-page="home">
+        <i class="fa-solid fa-house"></i>
+        <span>Beranda</span>
+      </div>
+      <div class="nav-item" data-page="camera">
+        <i class="fa-solid fa-expand"></i>
+        <span>Pindai</span>
+      </div>
+    </nav>
+    
+  </div>
+
+  <!-- MODAL DETAIL TANAMAN -->
+  <div class="modal" id="plant-detail-modal">
+    <div class="modal-content">
+      <div class="modal-header-img">
+        <button class="modal-close-btn" id="modal-close-btn"><i class="fa-solid fa-xmark"></i></button>
+        <img id="modal-img" src="" alt="Gambar Tanaman" style="width:100%; height:100%; object-fit:cover;">
+      </div>
+      <div class="modal-body">
+        <div class="modal-title-group">
+          <h2 id="modal-title">Nama Tanaman</h2>
+          <p class="latin" id="modal-latin">Latin Name</p>
+        </div>
+        
+        <div class="meta-item" style="margin-bottom: 18px;">
+          <span>Nama Lokal / Daerah</span>
+          <strong id="modal-local">Nama Lokal</strong>
+        </div>
+        
+        <div class="modal-section">
+          <h4>Deskripsi Botani</h4>
+          <p id="modal-desc">Deskripsi lengkap.</p>
+        </div>
+        
+        <div class="modal-section" style="display: none;">
+          <h4>Khasiat & Manfaat Kesehatan</h4>
+          <ul id="modal-benefits">
+            <!-- List Khasiat -->
+          </ul>
+        </div>
+        
+        <div class="modal-section" style="display: none;">
+          <h4>Cara Penggunaan / Pengolahan</h4>
+          <p id="modal-usage">Cara mengolah.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Files -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
