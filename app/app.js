@@ -970,23 +970,32 @@ document.addEventListener("DOMContentLoaded", () => {
   // Bot Typing
   function showBotTypingIndicator() {
     if (!chatMessagesContainer) return;
-    const typing = document.createElement("div");
-    typing.className = "chat-bubble bot typing-indicator-bubble";
-    typing.id = "bot-typing-indicator";
-    typing.innerHTML = `
-      <div style="display:flex; gap:4px; align-items:center; height:12px;">
-        <span style="width:6px; height:6px; background:var(--text-light); border-radius:50%; animation:bounceTyping 0.6s infinite alternate;"></span>
-        <span style="width:6px; height:6px; background:var(--text-light); border-radius:50%; animation:bounceTyping 0.6s infinite alternate; animation-delay:0.2s;"></span>
-        <span style="width:6px; height:6px; background:var(--text-light); border-radius:50%; animation:bounceTyping 0.6s infinite alternate; animation-delay:0.4s;"></span>
+    
+    // Cegah duplikasi
+    removeBotTypingIndicator();
+    
+    const row = document.createElement("div");
+    row.className = "chat-message-row bot";
+    row.id = "bot-typing-indicator";
+    row.innerHTML = `
+      <div class="chat-avatar-bot" title="PapuaBot">
+        <i class="fa-solid fa-leaf"></i>
+      </div>
+      <div class="chat-bubble bot typing-indicator-bubble" style="width: fit-content; display: flex; align-items: center; justify-content: center; min-width: 52px; height: 38px; padding: 12px 16px;">
+        <div style="display:flex; gap:4px; align-items:center; height:12px;">
+          <span style="width:6px; height:6px; background:var(--text-light); border-radius:50%; animation:bounceTyping 0.6s infinite alternate;"></span>
+          <span style="width:6px; height:6px; background:var(--text-light); border-radius:50%; animation:bounceTyping 0.6s infinite alternate; animation-delay:0.2s;"></span>
+          <span style="width:6px; height:6px; background:var(--text-light); border-radius:50%; animation:bounceTyping 0.6s infinite alternate; animation-delay:0.4s;"></span>
+        </div>
       </div>
       <style>
         @keyframes bounceTyping {
-          from { transform: translateY(0); }
-          to { transform: translateY(-6px); }
+          from { transform: translateY(2px); }
+          to { transform: translateY(-4px); }
         }
       </style>
     `;
-    chatMessagesContainer.appendChild(typing);
+    chatMessagesContainer.appendChild(row);
     chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
   }
 
