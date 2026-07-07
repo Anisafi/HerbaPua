@@ -483,10 +483,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (resAccuracyRing) resAccuracyRing.style.strokeDashoffset = 201;
     
     const phases = [
-      { text: "MEMBACA CITRA...", sub: "Melakukan normalisasi piksel (224x224)...", delay: 500 },
-      { text: "EKSTRAKSI FITUR...", sub: "Feature map via MobileNetV2 Backbone...", delay: 600 },
-      { text: "KLASIFIKASI CNN...", sub: "Menghitung nilai Dense Layer & Softmax...", delay: 500 },
-      { text: "KLASIFIKASI SELESAI!", sub: "Mendapatkan kelas probabilitas tertinggi...", delay: 300 }
+      { text: "MEMBACA CITRA...", sub: "Melakukan normalisasi piksel (224x224)...", delay: 200 },
+      { text: "EKSTRAKSI FITUR...", sub: "Feature map via MobileNetV2 Backbone...", delay: 250 },
+      { text: "KLASIFIKASI CNN...", sub: "Menghitung nilai Dense Layer & Softmax...", delay: 200 },
+      { text: "KLASIFIKASI SELESAI!", sub: "Mendapatkan kelas probabilitas tertinggi...", delay: 150 }
     ];
     
     let currentPhase = 0;
