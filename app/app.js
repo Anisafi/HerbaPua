@@ -1118,9 +1118,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     let matchedPlant = null;
-    if (typeof ENCYCLOPEDIA_DATA !== "undefined") {
+    
+    // 1. Prioritaskan mencari di 4 Tanaman Utama (PLANT_DATA)
+    if (typeof PLANT_DATA !== "undefined") {
+      for (const plant of Object.values(PLANT_DATA)) {
+        if (textLower.includes(plant.name.toLowerCase()) || 
+            (plant.latin && textLower.includes(plant.latin.toLowerCase())) || 
+            (plant.localName && textLower.includes(plant.localName.toLowerCase()))) {
+          matchedPlant = plant;
+          break;
+        }
+      }
+    }
+    
+    // 2. Cari di Ensiklopedia (ENCYCLOPEDIA_DATA) jika tidak ditemukan di tanaman utama
+    if (!matchedPlant && typeof ENCYCLOPEDIA_DATA !== "undefined") {
       for (const plant of Object.values(ENCYCLOPEDIA_DATA)) {
-        if (textLower.includes(plant.name.toLowerCase()) || textLower.includes(plant.latin.toLowerCase().split(' ')[0])) {
+        const latinGenus = plant.latin ? plant.latin.toLowerCase().split(' ')[0] : "";
+        const isCommonWord = ["daun", "buah", "pohon", "akar", "kayu", "bunga", "rumput", "sarang", "semut"].includes(latinGenus);
+        
+        const matchesName = textLower.includes(plant.name.toLowerCase());
+        const matchesLatin = plant.latin && textLower.includes(plant.latin.toLowerCase());
+        const matchesGenus = latinGenus && latinGenus.length >= 4 && !isCommonWord && textLower.includes(latinGenus);
+        
+        if (matchesName || matchesLatin || matchesGenus) {
           matchedPlant = plant;
           break;
         }
