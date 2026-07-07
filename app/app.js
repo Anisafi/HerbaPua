@@ -544,7 +544,7 @@ document.addEventListener("DOMContentLoaded", () => {
           
           if (response.ok) {
             const data = await response.json();
-            if (data && data.class && data.class !== "unknown") {
+            if (data && data.class) {
               apiPlantId = data.class;
               apiConfidence = data.confidence;
               console.log("Backend Gemini Classification success:", apiPlantId, apiConfidence);
@@ -655,8 +655,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const showDetails = isFocusPlant && isReliable;
 
     if (detectedPlantId === "unknown") {
-      if (resPlantName) resPlantName.innerText = "Tanaman Tidak Dikenal";
-      if (resPlantLatin) resPlantLatin.innerText = "Bukan bagian dari 4 target herbal";
+      if (resPlantName) resPlantName.innerText = "Bukan Tanaman Herbal";
+      if (resPlantLatin) resPlantLatin.innerText = "";
       if (resAccuracyVal) resAccuracyVal.innerText = "N/A";
       confidence = 0;
     } else if (isFocusPlant && isReliable) {
