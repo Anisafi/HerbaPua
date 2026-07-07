@@ -182,42 +182,49 @@ def call_gemini_api(api_key, message, image_data_url=None, local_prediction=None
         headers={'Content-Type': 'application/json'}
     )
     
-    try:
-        with urllib.request.urlopen(req, timeout=20) as response:
-            res_body = response.read().decode('utf-8')
-            res_json = json.loads(res_body)
-            candidates = res_json.get("candidates", [])
-            if candidates:
-                content = candidates[0].get("content", {})
-                parts = content.get("parts", [])
-                if parts:
-                    reply_text = parts[0].get("text", "").strip()
-                    
-                    # Sisipkan keterangan hasil klasifikasi CNN di awal balon chat bot
-                    if local_prediction and isinstance(local_prediction, dict):
-                        local_class = local_prediction.get("class", "")
-                        local_conf = local_prediction.get("confidence", 0.0)
+    import time
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            with urllib.request.urlopen(req, timeout=20) as response:
+                res_body = response.read().decode('utf-8')
+                res_json = json.loads(res_body)
+                candidates = res_json.get("candidates", [])
+                if candidates:
+                    content = candidates[0].get("content", {})
+                    parts = content.get("parts", [])
+                    if parts:
+                        reply_text = parts[0].get("text", "").strip()
                         
-                        plant_display_names = {
-                            "buah-merah": "Daun Buah Merah",
-                            "daun-gatal": "Daun Gatal",
-                            "daun-gedi": "Daun Gedi",
-                            "sarang-semut": "Sarang Semut",
-                            "tanaman-herbal": "Tanaman Herbal"
-                        }
-                        
-                        if local_class in plant_display_names:
-                            disp_name = plant_display_names[local_class]
-                            header = f"**Hasil Klasifikasi CNN:** {disp_name} ({local_conf}%)\n\n"
-                            reply_text = header + reply_text
-                        elif local_class == "unknown":
-                            header = f"**Hasil Klasifikasi CNN:** Tanaman Tidak Dikenal\n\n"
-                            reply_text = header + reply_text
+                        # Sisipkan keterangan hasil klasifikasi CNN di awal balon chat bot
+                        if local_prediction and isinstance(local_prediction, dict):
+                            local_class = local_prediction.get("class", "")
+                            local_conf = local_prediction.get("confidence", 0.0)
                             
-                    return {"reply": reply_text}
-            return {"reply": "Maaf, tidak ada respon dari AI."}
-    except Exception as e:
-        return {"reply": f"Gagal menghubungi Gemini API: {str(e)}"}
+                            plant_display_names = {
+                                "buah-merah": "Daun Buah Merah",
+                                "daun-gatal": "Daun Gatal",
+                                "daun-gedi": "Daun Gedi",
+                                "sarang-semut": "Sarang Semut",
+                                "tanaman-herbal": "Tanaman Herbal"
+                            }
+                            
+                            if local_class in plant_display_names:
+                                disp_name = plant_display_names[local_class]
+                                header = f"**Hasil Klasifikasi CNN:** {disp_name} ({local_conf}%)\n\n"
+                                reply_text = header + reply_text
+                            elif local_class == "unknown":
+                                header = f"**Hasil Klasifikasi CNN:** Tanaman Tidak Dikenal\n\n"
+                                reply_text = header + reply_text
+                                
+                        return {"reply": reply_text}
+                return {"reply": "Maaf, tidak ada respon dari AI."}
+        except Exception as e:
+            print(f"Chat API Error (Attempt {attempt+1}/{max_retries}): {e}", flush=True)
+            if "429" in str(e) and attempt < max_retries - 1:
+                time.sleep(2)
+                continue
+            return {"reply": f"Gagal menghubungi Gemini API: {str(e)}"}
 
 def call_gemini_classify(api_key, image_data_url):
     if not api_key:
@@ -269,22 +276,28 @@ def call_gemini_classify(api_key, image_data_url):
         headers={'Content-Type': 'application/json'}
     )
     
-    try:
-        with urllib.request.urlopen(req, timeout=20) as response:
-            res_body = response.read().decode('utf-8')
-            res_json = json.loads(res_body)
-            candidates = res_json.get("candidates", [])
-            if candidates:
-                content = candidates[0].get("content", {})
-                parts = content.get("parts", [])
-                if parts:
-                    text_resp = parts[0].get("text", "").strip()
-                    parsed = json.loads(text_resp)
-                    return parsed
+    import time
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            with urllib.request.urlopen(req, timeout=20) as response:
+                res_body = response.read().decode('utf-8')
+                res_json = json.loads(res_body)
+                candidates = res_json.get("candidates", [])
+                if candidates:
+                    content = candidates[0].get("content", {})
+                    parts = content.get("parts", [])
+                    if parts:
+                        text_resp = parts[0].get("text", "").strip()
+                        parsed = json.loads(text_resp)
+                        return parsed
+                return {"class": "unknown", "confidence": 0}
+        except Exception as e:
+            print(f"Classify API Error (Attempt {attempt+1}/{max_retries}): {e}", flush=True)
+            if "429" in str(e) and attempt < max_retries - 1:
+                time.sleep(2)
+                continue
             return {"class": "unknown", "confidence": 0}
-    except Exception as e:
-        print("Classify API Error:", e)
-        return {"class": "unknown", "confidence": 0}
 
 class MyHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):

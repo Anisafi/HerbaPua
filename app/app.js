@@ -922,7 +922,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         console.warn("Backend API tidak siap. Menggunakan fallback offline...");
         if (imgUrl) {
-          botClassifyImage(fileName);
+          botClassifyImage(fileName, imgUrl);
         } else {
           getBotTextResponse(text);
         }
@@ -931,7 +931,7 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Gagal menghubungi API chat backend. Fallback ke lokal:", err);
       removeBotTypingIndicator();
       if (imgUrl) {
-        botClassifyImage(fileName);
+        botClassifyImage(fileName, imgUrl);
       } else {
         getBotTextResponse(text);
       }
