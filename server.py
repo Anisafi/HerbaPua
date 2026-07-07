@@ -56,12 +56,23 @@ def call_gemini_api(api_key, message, image_data_url=None, local_prediction=None
     local_guidance = ""
     use_image = True
     
-    # Jika ada gambar diunggah ke chatbot, lakukan klasifikasi terpadu di backend yang sama dengan menu Pindai
+    # Jika ada gambar diunggah ke chatbot, lakukan klasifikasi terpadu di backend
     if image_data_url:
         print(f"--- DEBUG CHATBOT: Mengklasifikasikan gambar secara backend ---", flush=True)
-        local_prediction = call_gemini_classify(api_key, image_data_url)
+        api_prediction = call_gemini_classify(api_key, image_data_url)
+        print(f"--- DEBUG CHATBOT: api_prediction = {api_prediction} ---", flush=True)
         
-    print(f"--- DEBUG CHATBOT: local_prediction = {local_prediction} ---", flush=True)
+        # Gunakan hasil API jika sukses mendeteksi kelas yang valid (bukan unknown atau error)
+        if api_prediction and api_prediction.get("class") not in ["unknown", "error"]:
+            local_prediction = api_prediction
+        else:
+            # Jika API klasifikasi gagal/rate limit/unknown, gunakan prediksi lokal dari client (jika ada)
+            if local_prediction and isinstance(local_prediction, dict) and local_prediction.get("class") != "unknown":
+                print(f"--- DEBUG CHATBOT: Fallback menggunakan local_prediction dari client: {local_prediction} ---", flush=True)
+            else:
+                local_prediction = api_prediction
+                
+    print(f"--- DEBUG CHATBOT: Final local_prediction used = {local_prediction} ---", flush=True)
     if local_prediction and isinstance(local_prediction, dict):
         local_class = local_prediction.get("class", "")
         local_conf = local_prediction.get("confidence", 0.0)
