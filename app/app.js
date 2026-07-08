@@ -1163,32 +1163,48 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     if (matchedPlant) {
+      const isMainPlant = typeof PLANT_DATA !== "undefined" && PLANT_DATA[matchedPlant.id];
+      const prefix = isMainPlant ? "" : "Sobat, perlu diketahui bahwa tanaman/informasi ini tidak ada dalam database utama HerbaPua. Database utama penelitian kami hanya berfokus pada 4 tanaman obat khas Papua Barat Daya, yaitu: Daun Gedi, Daun Buah Merah, Daun Gatal, dan Sarang Semut. Namun, karena Sobat ingin mengetahui informasinya, berikut akan saya berikan penjelasan:\n\n";
+      
       if (textLower.includes("manfaat") || textLower.includes("khasiat") || textLower.includes("obat")) {
-        const text = `Khasiat utama **${matchedPlant.name}** berdasarkan kearifan lokal Papua:\n` + matchedPlant.benefits.map(b => `- ${b}`).join('\n');
+        const text = prefix + `Khasiat utama **${matchedPlant.name}** berdasarkan kearifan lokal Papua:\n` + matchedPlant.benefits.map(b => `- ${b}`).join('\n');
         appendChatMessage("bot", text);
       } else if (textLower.includes("olah") || textLower.includes("pakai") || textLower.includes("cara") || textLower.includes("konsumsi")) {
-        const text = `Cara penggunaan/pengolahan tradisional **${matchedPlant.name}**:\n\n${matchedPlant.usage}`;
+        const text = prefix + `Cara penggunaan/pengolahan tradisional **${matchedPlant.name}**:\n\n${matchedPlant.usage}`;
         appendChatMessage("bot", text);
       } else {
-        replyBotWithEncyclopediaPlant(matchedPlant);
+        if (!isMainPlant) {
+          const response = prefix + `Hasil Klasifikasi Ensiklopedia (Info Botani):\n\n` +
+            `Nama Tanaman: **${matchedPlant.name}** (*${matchedPlant.latin}*)\n` +
+            `Nama Lokal: **${matchedPlant.localName || matchedPlant.name}**\n` +
+            `Famili: **${matchedPlant.family || "-"}**\n\n` +
+            `**Deskripsi:**\n${matchedPlant.description}\n\n` +
+            `**Khasiat Utama:**\n${matchedPlant.benefits.map(b => `- ${b}`).join('\n')}\n\n` +
+            `**Cara Mengolah:**\n${matchedPlant.usage}`;
+          appendChatMessage("bot", response);
+        } else {
+          replyBotWithEncyclopediaPlant(matchedPlant);
+        }
       }
       return;
     }
     
+    const nonMainPrefix = "Sobat, perlu diketahui bahwa informasi ini tidak ada dalam database utama HerbaPua. Database utama penelitian kami hanya berfokus pada 4 tanaman obat khas Papua Barat Daya, yaitu: Daun Gedi, Daun Buah Merah, Daun Gatal, dan Sarang Semut. Namun, karena Sobat ingin mengetahui informasinya, berikut akan saya berikan penjelasan:\n\n";
+    
     if (textLower.includes("malaria")) {
-      appendChatMessage("bot", "Untuk mengobati **malaria**, masyarakat tradisional Papua umumnya menggunakan air rebusan **Kayu Susu** (*Alstonia scholaris*), daun **Sambiloto** (*Andrographis paniculata*), daun **Sampare** (*Glochidion sp.*), atau daun **Gatal** (*Laportea ducumana*) yang dipukulkan ke badan untuk merangsang keluarnya keringat.");
+      appendChatMessage("bot", nonMainPrefix + "Untuk mengobati **malaria**, masyarakat tradisional Papua umumnya menggunakan air rebusan **Kayu Susu** (*Alstonia scholaris*), daun **Sambiloto** (*Andrographis paniculata*), daun **Sampare** (*Glochidion sp.*), atau daun **Gatal** (*Laportea ducumana*) yang dipukulkan ke badan untuk merangsang keluarnya keringat.");
     } else if (textLower.includes("maag") || textLower.includes("lambung")) {
       appendChatMessage("bot", "Untuk meredakan **maag atau asam lambung**, tanaman yang sangat direkomendasikan adalah **Daun Gedi** (*Abelmoschus manihot L.*) karena lendir alaminya berkhasiat melapisi mukosa lambung dan menyejukkan peradangan.");
     } else if (textLower.includes("kanker") || textLower.includes("tumor")) {
-      appendChatMessage("bot", "Tanaman Papua yang legendaris untuk menangkal **kanker dan tumor** adalah **Sarang Semut** (*Myrmecodia spp.*) and **Buah Merah** (*Pandanus conoideus*) karena keduanya memiliki konsentrasi senyawa flavonoid dan antioksidan yang sangat tinggi.");
+      appendChatMessage("bot", "Tanaman Papua yang legendaris untuk menangkal **kanker dan tumor** adalah **Sarang Semut** (*Myrmecodia spp.*) dan **Buah Merah** (*Pandanus conoideus*) karena keduanya memiliki konsentrasi senyawa flavonoid dan antioksidan yang sangat tinggi.");
     } else if (textLower.includes("luka") || textLower.includes("darah")) {
-      appendChatMessage("bot", "Untuk menghentikan pendarahan pada **luka baru**, Suku Lanny menggunakan daun **Dollu** (*Dodonaea viscosa*), sedangkan di daerah Timika digunakan batang **Kangkung Laut** (*Merremia peltata*) yang dilunakkan.");
+      appendChatMessage("bot", nonMainPrefix + "Untuk menghentikan pendarahan pada **luka baru**, Suku Lanny menggunakan daun **Dollu** (*Dodonaea viscosa*), sedangkan di daerah Timika digunakan batang **Kangkung Laut** (*Merremia peltata*) yang dilunakkan.");
     } else if (textLower.includes("cnn") || textLower.includes("mobilenet") || textLower.includes("model")) {
       appendChatMessage("bot", "Aplikasi HerbaPua menggunakan model **Convolutional Neural Network (CNN)** dengan arsitektur **MobileNetV2** untuk mengidentifikasi 4 kelas utama secara visual melalui kamera. Sementara 48 tanaman lainnya tersedia di sistem pencarian Ensiklopedia.");
     } else if (textLower.includes("daun bungkus") || textLower.includes("tiga jari")) {
-      appendChatMessage("bot", " **Daun Bungkus** (*Daun tiga jari*) digunakan masyarakat tradisional Papua untuk vitalitas pria. Daun ditumbuk kasar dicampur minyak kelapa, lalu dibungkus pada organ vital selama maksimal 10-15 menit. Zat histamin di dalamnya memicu pelebaran pembuluh darah lokal.");
+      appendChatMessage("bot", nonMainPrefix + "**Daun Bungkus** (*Daun tiga jari*) digunakan masyarakat tradisional Papua untuk vitalitas pria. Daun ditumbuk kasar dicampur minyak kelapa, lalu dibungkus pada organ vital selama maksimal 10-15 menit. Zat histamin di dalamnya memicu pelebaran pembuluh darah lokal.");
     } else {
-      appendChatMessage("bot", "Maaf, saya belum memahami pertanyaan Anda. Coba tanyakan khasiat tanaman spesifik, contoh: *'apa khasiat sambiloto?'* atau *'cara olah daun bungkus'*.");
+      appendChatMessage("bot", "Sobat, perlu diketahui bahwa informasi/tanaman tersebut tidak ada dalam database utama HerbaPua. Database utama penelitian kami hanya berfokus pada 4 tanaman obat khas Papua Barat Daya, yaitu: Daun Gedi, Daun Buah Merah, Daun Gatal, dan Sarang Semut. Coba tanyakan khasiat tanaman spesifik fokus kami, atau ketik nama tanaman ensiklopedia lainnya.");
     }
   }
 
