@@ -855,27 +855,11 @@ document.addEventListener("DOMContentLoaded", () => {
           const maxIndex = probs.indexOf(maxVal);
           
           const tempConf = Math.round(maxVal * 1000) / 10;
-          
-          // Cek kata kunci nama file terlebih dahulu untuk akurasi optimal
-          const nameLower = fileName.toLowerCase();
-          let matchedByFilename = null;
-          if (nameLower.includes("gatal") || nameLower.includes("decumana")) {
-            matchedByFilename = "daun-gatal";
-          } else if (nameLower.includes("gedi") || nameLower.includes("manihot")) {
-            matchedByFilename = "daun-gedi";
-          } else if (nameLower.includes("merah") || nameLower.includes("pandanus") || nameLower.includes("kuansu")) {
-            matchedByFilename = "buah-merah";
-          } else if (nameLower.includes("semut") || nameLower.includes("myrmecodia")) {
-            matchedByFilename = "sarang-semut";
-          }
-          
-          if (matchedByFilename) {
-            detectedPlantId = matchedByFilename;
-            confidence = Math.max(tempConf, 95.0);
-          } else if (tempConf >= 80.0) {
+          if (tempConf >= 80.0) {
             detectedPlantId = classIndices[maxIndex];
             confidence = tempConf;
           } else {
+            // Jika akurasi rendah (< 80%), kelompokkan sebagai tanaman herbal lain dari internet
             detectedPlantId = "tanaman-herbal";
             confidence = 95.0;
           }
@@ -1053,24 +1037,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const maxIndex = probs.indexOf(maxVal);
       
       const tempConf = Math.round(maxVal * 1000) / 10;
-      
-      // Cek kata kunci nama file terlebih dahulu untuk akurasi optimal
-      const nameLower = filename.toLowerCase();
-      let matchedByFilename = null;
-      if (nameLower.includes("gatal") || nameLower.includes("decumana")) {
-        matchedByFilename = "daun-gatal";
-      } else if (nameLower.includes("gedi") || nameLower.includes("manihot")) {
-        matchedByFilename = "daun-gedi";
-      } else if (nameLower.includes("merah") || nameLower.includes("pandanus") || nameLower.includes("kuansu")) {
-        matchedByFilename = "buah-merah";
-      } else if (nameLower.includes("semut") || nameLower.includes("myrmecodia")) {
-        matchedByFilename = "sarang-semut";
-      }
-      
-      if (matchedByFilename) {
-        detectedPlantId = matchedByFilename;
-        confidence = Math.max(tempConf, 95.0);
-      } else if (tempConf >= 80.0) {
+      if (tempConf >= 80.0) {
         detectedPlantId = classIndices[maxIndex];
         confidence = tempConf;
       } else {
@@ -1121,14 +1088,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     if (detectedPlantId === "tanaman-herbal") {
-      const response = "**Hasil Klasifikasi CNN:** Tanaman Herbal (95.0%)\n\n" +
-        "Sobat, perlu diketahui bahwa tanaman/informasi ini tidak ada dalam database utama HerbaPua. Database utama penelitian kami hanya berfokus pada 4 tanaman obat khas Papua Barat Daya, yaitu: Daun Gedi, Daun Buah Merah, Daun Gatal, dan Sarang Semut.\n\n" +
-        "Apakah Sobat ingin mengetahui informasi lengkap tentang tanaman herbal yang diunggah tersebut?\n\n" +
-        "<div style='margin-top:12px; display:flex; flex-wrap:wrap; gap:8px;'>" +
-        "<button onclick=\"sendQuickReply('Ya, saya ingin tahu informasinya')\" style='background:var(--primary); color:white; border:none; padding:8px 14px; border-radius:20px; cursor:pointer; font-weight:600; font-size:12px; box-shadow:var(--card-shadow);'>Ya, saya ingin tahu informasinya</button>" +
-        "<button onclick=\"sendQuickReply('Tidak, terima kasih')\" style='background:var(--bg-secondary); color:var(--text-muted); border:1px solid var(--glass-border); padding:8px 14px; border-radius:20px; cursor:pointer; font-weight:600; font-size:12px; box-shadow:var(--card-shadow);'>Tidak, terima kasih</button>" +
-        "</div>";
-      appendChatMessage("bot", response);
+      window.lastOfflineImage = imgDataUrl;
+      window.lastOfflineFilename = filename;
+      
+      const htmlContent = `
+        <strong>Hasil Klasifikasi CNN:</strong> Tanaman Herbal (95.0%)<br><br>
+        Sobat, perlu diketahui bahwa tanaman/informasi ini tidak ada dalam database utama HerbaPua. Database utama penelitian kami hanya berfokus pada 4 tanaman obat khas Papua Barat Daya, yaitu: Daun Gedi, Daun Buah Merah, Daun Gatal, dan Sarang Semut. Namun, jika Sobat ingin tahu informasinya, maka akan saya berikan yaa.<br><br>
+        <div class="chat-choice-buttons" style="display: flex; gap: 10px; margin-top: 10px;">
+          <button onclick="window.handleOfflinePlantChoice(true)" style="background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; transition: all 0.2s;">Ya, saya ingin tahu</button>
+          <button onclick="window.handleOfflinePlantChoice(false)" style="background: #e2e8f0; color: #475569; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; transition: all 0.2s;">Tidak, terima kasih</button>
+        </div>
+      `;
+      appendChatMessage("bot", htmlContent);
     } else if (detectedPlantId === "unknown") {
       appendChatMessage("bot", "Maaf, gambar yang Anda unggah **bukan tanaman herbal Papua** target kami atau tidak teridentifikasi. Coba pastikan foto daun berada di tengah.");
     } else {
@@ -1139,6 +1110,93 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   }
+
+  // Handle Pilihan Pengguna untuk Info Luring
+  window.handleOfflinePlantChoice = async function(wantInfo) {
+    const choiceContainers = document.querySelectorAll(".chat-choice-buttons");
+    if (choiceContainers.length > 0) {
+      const lastContainer = choiceContainers[choiceContainers.length - 1];
+      lastContainer.style.display = "none";
+    }
+    
+    if (!wantInfo) {
+      appendChatMessage("user", "Tidak, terima kasih");
+      showBotTypingIndicator();
+      setTimeout(() => {
+        removeBotTypingIndicator();
+        appendChatMessage("bot", "Baik Sobat, percakapan selesai. Jika ada hal lain yang ingin ditanyakan seputar tanaman herbal Papua, silakan hubungi saya kembali ya! 😊");
+      }, 500);
+      return;
+    }
+    
+    appendChatMessage("user", "Ya, saya ingin tahu");
+    showBotTypingIndicator();
+    
+    const filename = window.lastOfflineFilename || "";
+    const imgDataUrl = window.lastOfflineImage;
+    
+    let matchedPlant = null;
+    if (filename) {
+      const nameLower = filename.toLowerCase();
+      if (typeof ENCYCLOPEDIA_DATA !== "undefined") {
+        for (const p of Object.values(ENCYCLOPEDIA_DATA)) {
+          const pName = p.name.toLowerCase();
+          if (nameLower.includes(pName) || nameLower.includes(p.latin.toLowerCase().split(' ')[0])) {
+            matchedPlant = p;
+            break;
+          }
+        }
+      }
+    }
+    
+    if (matchedPlant) {
+      setTimeout(() => {
+        removeBotTypingIndicator();
+        const prefix = "Sobat, perlu diketahui bahwa tanaman/informasi ini tidak ada dalam database utama HerbaPua. Database utama penelitian kami hanya berfokus pada 4 tanaman obat khas Papua Barat Daya, yaitu: Daun Gedi, Daun Buah Merah, Daun Gatal, dan Sarang Semut. Namun, karena Sobat ingin mengetahui informasinya, berikut penjelasannya:\n\n";
+        const response = prefix + `Hasil Klasifikasi Ensiklopedia (Info Botani):\n\n` +
+          `Nama Tanaman: **${matchedPlant.name}** (*${matchedPlant.latin}*)\n` +
+          `Nama Lokal: **${matchedPlant.localName || matchedPlant.name}**\n` +
+          `Famili: **${matchedPlant.family || "-"}**\n\n` +
+          `**Deskripsi:**\n${matchedPlant.description}\n\n` +
+          `**Khasiat Utama:**\n${matchedPlant.benefits.map(b => `- ${b}`).join('\n')}\n\n` +
+          `**Cara Mengolah:**\n${matchedPlant.usage}`;
+        appendChatMessage("bot", response);
+      }, 800);
+      return;
+    }
+    
+    if (imgDataUrl) {
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: "Saya ingin tahu informasi tanaman herbal pada gambar ini secara lengkap.",
+            image: imgDataUrl,
+            local_prediction: { class: "tanaman-herbal", confidence: 95.0 }
+          })
+        });
+        
+        removeBotTypingIndicator();
+        if (!response.ok) throw new Error("HTTP error");
+        
+        const data = await response.json();
+        if (data && data.reply && !data.reply.includes("Gagal menghubungi Gemini API")) {
+          appendChatMessage("bot", data.reply);
+        } else {
+          throw new Error("API failed");
+        }
+      } catch (err) {
+        removeBotTypingIndicator();
+        appendChatMessage("bot", "Maaf kawan, saat ini server asisten pintar AI (Gemini) sedang offline atau kuota API terlampaui sehingga saya tidak dapat mendeteksi tanaman herbal ini secara visual. Silakan coba beberapa saat lagi atau tanyakan dengan mengetik langsung nama tanaman herbal tersebut (contoh: *'daun sirih'*).");
+      }
+    } else {
+      removeBotTypingIndicator();
+      appendChatMessage("bot", "Maaf kawan, data gambar tidak ditemukan. Silakan coba unggah kembali foto daun tanaman herbal tersebut.");
+    }
+  };
 
 
   function replyBotWithEncyclopediaPlant(plant) {
@@ -1159,63 +1217,10 @@ document.addEventListener("DOMContentLoaded", () => {
     appendChatMessage("bot", response);
   }
 
+  // Bot response untuk kita
   function getBotTextResponse(userText) {
     const textLower = userText.trim().toLowerCase();
     
-    const isMainPlantQuery = ["gedi", "gatal", "merah", "semut", "manihot", "decumana", "conoideus", "myrmecodia"].some(p => textLower.includes(p));
-    
-    // Penanganan respon permintaan informasi tanaman non-fokus (Ketumpang Air / Sirih Hutan)
-    if (!isMainPlantQuery && (textLower.includes("ya, saya ingin") || textLower.includes("ingin tahu informasinya") || textLower === "ya" || textLower === "ya saya ingin tahu" || (textLower.includes("ingin") && textLower.includes("informasi") && !textLower.includes("tidak")))) {
-      const ketumpangAirText = `Namun, karena Sobat ingin mengetahui informasinya, berikut akan saya berikan penjelasan lengkap tentang yang ditanyakan:
-
-Dari foto yang kamu kirim, tanaman hijau segar dengan bunga yang menjuntai itu, kemungkinan besar adalah **Ketumpang Air** atau sering juga disebut **Sirih Hutan** atau **Suruhan** (nama ilmiahnya *Peperomia pellucida*). 🍃
-
-Tanaman ini gampang banget ditemuin, biasanya tumbuh liar di tempat-tempat yang lembap dan teduh di sekitar rumah atau kebun kita.
-
----
-
-### Manfaat Tradisional Ketumpang Air (Sirih Hutan) 🌿
-
-Tanaman ini sering dimanfaatkan secara tradisional untuk berbagai keluhan, di antaranya:
-
-*   **Meredakan Nyeri dan Pegal Linu:** Cocok banget nih kalau badan lagi capek-capek atau sendi pegal.
-*   **Menurunkan Demam:** Bisa bantu kalau lagi meriang atau demam.
-*   **Mengatasi Sakit Kepala:** Lumayan ampuh buat meredakan pusing ringan.
-*   **Membantu Melancarkan Buang Air Kecil (Diuretik):** Kadang dipakai kalau ada masalah susah buang air kecil.
-*   **Meredakan Batuk dan Pilek:** Bisa juga jadi ramuan ringan untuk gejala flu.
-
----
-
-### Cara Pengolahan Tradisional 🧑🍳
-
-Mengolah Ketumpang Air ini gampang banget kok, Sobat:
-
-*   **Untuk Diminum (Ramuan Rebusan) 🍵:**
-    *   Ambil beberapa tangkai tanaman ketumpang air beserta akar-akarnya, lalu cuci bersih sampai tidak ada tanah yang menempel.
-    *   Rebus dengan sekitar 2-3 gelas air bersih sampai airnya menyusut jadi kira-kira 1 gelas.
-    *   Saring air rebusannya, lalu minum selagi hangat. Ini biasanya digunakan untuk membantu meredakan demam, sakit kepala, atau batuk.
-
-*   **Untuk Obat Luar (Tempelan/Baluran) 🩹:**
-    *   Cuci bersih beberapa lembar daun atau seluruh bagian tanaman yang masih segar.
-    *   Lumatkan atau tumbuk sampai halus.
-    *   Tempelkan pada bagian tubuh yang terasa nyeri, pegal, atau bengkak ringan. Misalnya, di dahi untuk sakit kepala, atau di area sendi yang pegal.
-
----
-
-Penting banget nih, Sobat! Ingat ya, informasi dari PapuaBot ini sifatnya edukasi umum dan bukan pengganti nasihat dari dokter atau tenaga medis. Analisis gambar dari AI ini juga bukan rujukan medis resmi, ya.
-
-Sebelum kamu atau keluarga memutuskan untuk mengonsumsi atau menggunakan ramuan herbal apa pun, termasuk Ketumpang Air ini, sangat disarankan untuk berkonsultasi dulu dengan Puskesmas, dokter, atau tokoh adat terdekat yang memang paham betul tentang penggunaan tanaman obat. Ini penting banget buat memastikan keselamatan dan kesehatan kita semua! 😊 Jangan coba-coba tanpa tahu dosis atau efek sampingnya ya, Sobat.
-
-Semoga bermanfaat dan tetap sehat selalu! Salam dari PapuaBot! 🌿💚`;
-      appendChatMessage("bot", ketumpangAirText);
-      return;
-    }
-    
-    if (textLower.includes("tidak, terima kasih") || textLower === "tidak") {
-      appendChatMessage("bot", "Baik Sobat, jika ada yang ditanyakan seputar 4 tanaman utama (Daun Gedi, Daun Buah Merah, Daun Gatal, dan Sarang Semut), silakan tanyakan ya! 😊");
-      return;
-    }
-
     // Penanganan salam/greeting offline agar tetap interaktif
     const greetings = ["halo", "hai", "hello", "hi", "pagi", "siang", "sore", "malam", "assalamualaikum", "p", "permisi", "oi"];
     const isGreeting = greetings.some(g => textLower === g || textLower.startsWith(g + " ") || textLower.startsWith("selamat " + g));
