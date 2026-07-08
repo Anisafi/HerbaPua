@@ -402,33 +402,66 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         super().end_headers()
 
+def get_local_ip():
+    import socket
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        s.connect(('10.255.255.255', 1))
+        IP = s.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        s.close()
+    return IP
+
 def start_localtunnel_and_qr():
     time.sleep(2)
+    
+    # 1. BUAT QR CODE LOKAL (Wi-Fi) TERLEBIH DAHULU (Instan & Bebas Internet)
     try:
-        print("\n[INFO] Menghubungkan ke Localtunnel untuk akses HP...", flush=True)
-        if os.path.exists("localtunnel_url.txt"):
+        local_ip = get_local_ip()
+        local_url = f"http://{local_ip}:8000/app/index.html"
+        print(f"\n[INFO] IP Lokal Wi-Fi Anda: {local_ip}")
+        print(f"[INFO] Tautan Lokal HP: {local_url}")
+        
+        local_qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={local_url}"
+        local_qr_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scan_hp_qrcode_local.png")
+        
+        urllib.request.urlretrieve(local_qr_url, local_qr_file)
+        print(f"[INFO] QR Code Lokal dibuat: {local_qr_file}")
+        print("[INFO] Membuka QR Code Lokal... Silakan scan dengan HP jika terhubung ke Wi-Fi yang sama!")
+        os.startfile(local_qr_file)
+    except Exception as e:
+        print("[ERROR] Gagal membuat QR Code Lokal:", e)
+
+    # 2. BUAT QR CODE INTERNET (Localtunnel HTTPS) UNTUK FITUR KAMERA HP
+    try:
+        print("\n[INFO] Menghubungkan ke Localtunnel untuk akses internet HP (kamera aktif)...", flush=True)
+        url_file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "localtunnel_url.txt")
+        if os.path.exists(url_file_path):
             try:
-                os.remove("localtunnel_url.txt")
+                os.remove(url_file_path)
             except:
                 pass
                 
-        # Jalankan localtunnel dan arahkan stdout ke file langsung
+        # Jalankan localtunnel dan arahkan stdout ke file absolut langsung
         proc = subprocess.Popen(
-            r'cmd.exe /c "node node_modules\localtunnel\bin\lt.js --port 8000 > localtunnel_url.txt 2>&1"',
+            f'cmd.exe /c "node node_modules\\localtunnel\\bin\\lt.js --port 8000 > \\"{url_file_path}\\" 2>&1"',
             shell=True
         )
         
-        # Lakukan pemantauan isi file localtunnel_url.txt
         url = ""
-        for _ in range(15):
+        for _ in range(25): # Tunggu lebih lama (25 detik)
             time.sleep(1)
-            if os.path.exists("localtunnel_url.txt"):
+            if os.path.exists(url_file_path):
                 try:
-                    with open("localtunnel_url.txt", "r") as f:
+                    with open(url_file_path, "r") as f:
                         content = f.read().strip()
                         if "your url is:" in content:
                             url = content.split("your url is:")[1].strip()
                             break
+                        elif "error" in content.lower() or "failed" in content.lower():
+                            print(f"[Localtunnel Error Log] {content}", flush=True)
                 except:
                     pass
                     
@@ -437,18 +470,25 @@ def start_localtunnel_and_qr():
             print(f"  URL Akses HP Anda: {url}", flush=True)
             print(f"==================================================\n", flush=True)
             
-            qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={url}"
-            qr_file = os.path.join(os.path.dirname(__file__), "scan_hp_qrcode.png")
+            internet_qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={url}"
+            internet_qr_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scan_hp_qrcode_internet.png")
             
             try:
-                urllib.request.urlretrieve(qr_url, qr_file)
-                print(f"[INFO] QR Code berhasil dibuat: {qr_file}", flush=True)
-                print("[INFO] Membuka QR Code di laptop Anda... Silakan scan dengan kamera HP!", flush=True)
-                os.startfile(qr_file)
+                urllib.request.urlretrieve(internet_qr_url, internet_qr_file)
+                print(f"[INFO] QR Code Internet (HTTPS) dibuat: {internet_qr_file}", flush=True)
+                print("[INFO] Membuka QR Code Internet... Scan ini untuk mengaktifkan KAMERA HP!", flush=True)
+                os.startfile(internet_qr_file)
             except Exception as qr_err:
-                print("[ERROR] Gagal mengunduh QR Code:", qr_err, flush=True)
+                print("[ERROR] Gagal mengunduh QR Code Internet:", qr_err, flush=True)
         else:
-            print("[WARNING] Localtunnel tidak memberikan respon URL dalam 15 detik.", flush=True)
+            print("[WARNING] Localtunnel tidak memberikan respon URL dalam 25 detik.", flush=True)
+            # Tampilkan isi log jika ada untuk diagnosa
+            if os.path.exists(url_file_path):
+                try:
+                    with open(url_file_path, "r") as f:
+                        print(f"[Localtunnel Log Terakhir] {f.read().strip()}", flush=True)
+                except:
+                    pass
     except Exception as e:
         print("[ERROR] Gagal menjalankan localtunnel:", e, flush=True)
 
