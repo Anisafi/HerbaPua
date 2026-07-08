@@ -1088,7 +1088,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     
     if (detectedPlantId === "tanaman-herbal") {
-      appendChatMessage("bot", "**Hasil Klasifikasi CNN:** Tanaman Herbal (95.0%)\n\nSobat, gambar yang Anda unggah terdeteksi sebagai **Tanaman Herbal** secara umum.\n\nKarena server kecerdasan buatan (Gemini) sedang offline atau kuota API terlampaui saat ini, saya tidak dapat mengidentifikasi nama daerah spesifik tanaman herbal tersebut secara visual. Secara umum, pastikan Anda merebus daun herbal secara bersih sebelum mengonsumsinya dan tetap berkonsultasi dengan dokter terdekat.");
+      const response = "**Hasil Klasifikasi CNN:** Tanaman Herbal (95.0%)\n\n" +
+        "Sobat, perlu diketahui bahwa tanaman/informasi ini tidak ada dalam database utama HerbaPua. Database utama penelitian kami hanya berfokus pada 4 tanaman obat khas Papua Barat Daya, yaitu: Daun Gedi, Daun Buah Merah, Daun Gatal, dan Sarang Semut. Namun, karena Sobat ingin mengetahui informasinya, berikut akan saya berikan penjelasan lengkap tentang yang ditanyakan:\n\n" +
+        "*(Catatan: Karena koneksi server AI/Gemini sedang dibatasi kuota atau offline saat ini, berikut adalah tips umum pengolahan tanaman obat/herbal secara aman:)*\n" +
+        "- Selalu bersihkan daun/tanaman herbal di bawah air bersih yang mengalir.\n" +
+        "- Rebus daun secara higienis dalam wadah tanah liat, kaca, atau stainless steel (hindari wadah aluminium).\n" +
+        "- Konsumsi ramuan dalam dosis wajar dan jangan mencampur berbagai jenis daun tanpa petunjuk.\n" +
+        "- Tetap berkonsultasi dengan puskesmas, dokter, atau tokoh adat setempat sebelum mengonsumsi obat tradisional.";
+      appendChatMessage("bot", response);
     } else if (detectedPlantId === "unknown") {
       appendChatMessage("bot", "Maaf, gambar yang Anda unggah **bukan tanaman herbal Papua** target kami atau tidak teridentifikasi. Coba pastikan foto daun berada di tengah.");
     } else {
