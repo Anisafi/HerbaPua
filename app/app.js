@@ -1013,14 +1013,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Bot response untuk gambar (Fallback Offline)
-  async function botClassifyImage(filename) {
+  async function botClassifyImage(filename, imgDataUrl = null) {
     let detectedPlantId = "tanaman-herbal";
     let confidence = 95.0;
     
     let realPredictions = null;
-    if (model && chatPreviewImg && chatPreviewImg.src) {
+    if (model) {
       try {
-        realPredictions = await runRealCNNInference(chatPreviewImg);
+        const sourceImg = (chatPreviewImg && chatPreviewImg.src) ? chatPreviewImg : null;
+        if (sourceImg && sourceImg.src) {
+          realPredictions = await runRealCNNInference(sourceImg);
+        } else if (imgDataUrl) {
+          const tempImg = new Image();
+          tempImg.src = imgDataUrl;
+          await new Promise((resolve) => {
+            tempImg.onload = resolve;
+          });
+          realPredictions = await runRealCNNInference(tempImg);
+        }
       } catch (e) {
         console.warn("Offline fallback chatbot local inference failed:", e);
       }
