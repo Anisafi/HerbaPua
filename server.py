@@ -17,6 +17,38 @@ def load_config():
             pass
     return {}
 
+def get_api_keys(config):
+    keys = []
+    # Cek 'GEMINI_API_KEY' (bisa berupa list atau string)
+    val = config.get("GEMINI_API_KEY", "")
+    if isinstance(val, list):
+        keys.extend(val)
+    elif val:
+        keys.append(val)
+        
+    # Cek 'api_key' (bisa berupa list atau string)
+    val2 = config.get("api_key", "")
+    if isinstance(val2, list):
+        keys.extend(val2)
+    elif val2:
+        if val2 not in keys:
+            keys.append(val2)
+            
+    # Cek 'api_keys' (bisa berupa list)
+    val3 = config.get("api_keys", [])
+    for k in val3:
+        if k not in keys:
+            keys.append(k)
+            
+    # Cek Environment variable
+    env_key = os.environ.get("GEMINI_API_KEY", "")
+    if env_key and env_key not in keys:
+        keys.append(env_key)
+        
+    if not keys:
+        keys = [""]
+    return keys
+
 def parse_data_url(data_url):
     m = re.match(r'^data:([^;]+);base64,(.+)$', data_url)
     if m:
@@ -27,7 +59,10 @@ def call_gemini_api(api_key, message, image_data_url=None, local_prediction=None
     if not api_key:
         return {"reply": "Maaf, API Key Gemini belum dikonfigurasi di berkas config.json pada server."}
         
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+    if isinstance(api_key, list):
+        api_keys = list(api_key)
+    else:
+        api_keys = [api_key]
     
     # Membaca data Buku Tumbuhan Obat Tradisional Papua (SP3T 2016)
     book_context = ""
@@ -183,16 +218,19 @@ def call_gemini_api(api_key, message, image_data_url=None, local_prediction=None
         }
     }
     
-    req_data = json.dumps(req_body).encode('utf-8')
-    req = urllib.request.Request(
-        url,
-        data=req_data,
-        headers={'Content-Type': 'application/json'}
-    )
-    
     import time
-    max_retries = 3
+    max_retries = len(api_keys) * 2
     for attempt in range(max_retries):
+        current_key = api_keys[attempt % len(api_keys)]
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={current_key}"
+        
+        req_data = json.dumps(req_body).encode('utf-8')
+        req = urllib.request.Request(
+            url,
+            data=req_data,
+            headers={'Content-Type': 'application/json'}
+        )
+        
         try:
             with urllib.request.urlopen(req, timeout=20) as response:
                 res_body = response.read().decode('utf-8')
@@ -228,8 +266,11 @@ def call_gemini_api(api_key, message, image_data_url=None, local_prediction=None
                         return {"reply": reply_text}
                 return {"reply": "Maaf, tidak ada respon dari AI."}
         except Exception as e:
-            print(f"Chat API Error (Attempt {attempt+1}/{max_retries}): {e}", flush=True)
-            if "429" in str(e) and attempt < max_retries - 1:
+            print(f"Chat API Error (Attempt {attempt+1}/{max_retries} with key index {attempt % len(api_keys)}): {e}", flush=True)
+            if "429" in str(e) and len(api_keys) > 1:
+                print("Rate limit 429 hit, switching key immediately...", flush=True)
+                continue
+            elif "429" in str(e):
                 time.sleep(2)
                 continue
             return {"reply": f"Gagal menghubungi Gemini API: {str(e)}"}
@@ -238,7 +279,10 @@ def call_gemini_classify(api_key, image_data_url):
     if not api_key:
         return {"class": "unknown", "confidence": 0}
         
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={api_key}"
+    if isinstance(api_key, list):
+        api_keys = list(api_key)
+    else:
+        api_keys = [api_key]
     
     mime_type, base64_data = parse_data_url(image_data_url)
     if not mime_type or not base64_data:
@@ -277,16 +321,19 @@ def call_gemini_classify(api_key, image_data_url):
         }
     }
     
-    req_data = json.dumps(req_body).encode('utf-8')
-    req = urllib.request.Request(
-        url,
-        data=req_data,
-        headers={'Content-Type': 'application/json'}
-    )
-    
     import time
-    max_retries = 3
+    max_retries = len(api_keys) * 2
     for attempt in range(max_retries):
+        current_key = api_keys[attempt % len(api_keys)]
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={current_key}"
+        
+        req_data = json.dumps(req_body).encode('utf-8')
+        req = urllib.request.Request(
+            url,
+            data=req_data,
+            headers={'Content-Type': 'application/json'}
+        )
+        
         try:
             with urllib.request.urlopen(req, timeout=20) as response:
                 res_body = response.read().decode('utf-8')
@@ -301,8 +348,11 @@ def call_gemini_classify(api_key, image_data_url):
                         return parsed
                 return {"class": "unknown", "confidence": 0}
         except Exception as e:
-            print(f"Classify API Error (Attempt {attempt+1}/{max_retries}): {e}", flush=True)
-            if "429" in str(e) and attempt < max_retries - 1:
+            print(f"Classify API Error (Attempt {attempt+1}/{max_retries} with key index {attempt % len(api_keys)}): {e}", flush=True)
+            if "429" in str(e) and len(api_keys) > 1:
+                print("Rate limit 429 hit, switching key immediately...", flush=True)
+                continue
+            elif "429" in str(e):
                 time.sleep(2)
                 continue
             return {"class": "unknown", "confidence": 0}
@@ -315,10 +365,10 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
             req_body = json.loads(post_data.decode('utf-8'))
             
             config = load_config()
-            api_key = config.get("GEMINI_API_KEY", "")
+            api_keys = get_api_keys(config)
             
             response_data = call_gemini_api(
-                api_key, 
+                api_keys, 
                 req_body.get('message', ''), 
                 req_body.get('image'),
                 req_body.get('local_prediction')
@@ -334,10 +384,10 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
             req_body = json.loads(post_data.decode('utf-8'))
             
             config = load_config()
-            api_key = config.get("GEMINI_API_KEY", "")
+            api_keys = get_api_keys(config)
             
             response_data = call_gemini_classify(
-                api_key, 
+                api_keys, 
                 req_body.get('image')
             )
             

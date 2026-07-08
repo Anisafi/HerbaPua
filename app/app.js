@@ -899,6 +899,26 @@ document.addEventListener("DOMContentLoaded", () => {
     
     showBotTypingIndicator();
     
+    // Intersepsi dospem: Jika gambar terdeteksi sebagai "tanaman-herbal" (di luar 4 fokus utama)
+    if (localPrediction && localPrediction.class === "tanaman-herbal") {
+      setTimeout(() => {
+        removeBotTypingIndicator();
+        window.lastOfflineImage = imgUrl;
+        window.lastOfflineFilename = fileName;
+        
+        const htmlContent = `
+          <strong>Hasil Klasifikasi CNN:</strong> Tanaman Herbal (95.0%)<br><br>
+          Sobat, perlu diketahui bahwa tanaman/informasi ini tidak ada dalam database utama HerbaPua. Database utama penelitian kami hanya berfokus pada 4 tanaman obat khas Papua Barat Daya, yaitu: Daun Gedi, Daun Buah Merah, Daun Gatal, dan Sarang Semut. Namun, jika Sobat ingin tahu informasinya, maka akan saya berikan yaa.<br><br>
+          <div class="chat-choice-buttons" style="display: flex; gap: 10px; margin-top: 10px;">
+            <button onclick="window.handleOfflinePlantChoice(true)" style="background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; transition: all 0.2s;">Ya, saya ingin tahu</button>
+            <button onclick="window.handleOfflinePlantChoice(false)" style="background: #e2e8f0; color: #475569; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; transition: all 0.2s;">Tidak, terima kasih</button>
+          </div>
+        `;
+        appendChatMessage("bot", htmlContent);
+      }, 800);
+      return;
+    }
+    
     try {
       const response = await fetch("/api/chat", {
         method: "POST",
