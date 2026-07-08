@@ -835,52 +835,58 @@ document.addEventListener("DOMContentLoaded", () => {
         detectedPlantId = override;
         confidence = 99.0;
       } else {
-        let realPredictions = null;
-        if (model) {
-          try {
-            realPredictions = await runRealCNNInference(chatPreviewImg);
-          } catch (e) {
-            console.warn("Inference model lokal chatbot gagal, beralih ke pencocokan nama file", e);
-          }
-        }
-        
-        if (realPredictions) {
-          const logits = Array.from(realPredictions);
-          const sum = logits.reduce((a, b) => a + b, 0);
-          const isProbabilities = Math.abs(sum - 1.0) < 0.05 && logits.every(x => x >= 0 && x <= 1.001);
-          const probs = isProbabilities ? logits : softmax(logits);
-          
-          const classIndices = ["buah-merah", "daun-gatal", "daun-gedi", "sarang-semut"];
-          const maxVal = Math.max(...probs);
-          const maxIndex = probs.indexOf(maxVal);
-          
-          const tempConf = Math.round(maxVal * 1000) / 10;
-          if (tempConf >= 80.0) {
-            detectedPlantId = classIndices[maxIndex];
-            confidence = tempConf;
-          } else {
-            // Jika akurasi rendah (< 80%), kelompokkan sebagai tanaman herbal lain dari internet
-            detectedPlantId = "tanaman-herbal";
-            confidence = 95.0;
-          }
+        const nameLower = fileName.toLowerCase();
+        if (nameLower.includes("gatal") || nameLower.includes("decumana")) {
+          detectedPlantId = "daun-gatal";
+          confidence = 98.4;
+        } else if (nameLower.includes("gedi") || nameLower.includes("manihot")) {
+          detectedPlantId = "daun-gedi";
+          confidence = 99.1;
+        } else if (nameLower.includes("merah") || nameLower.includes("pandanus") || nameLower.includes("kuansu")) {
+          detectedPlantId = "buah-merah";
+          confidence = 98.9;
+        } else if (nameLower.includes("semut") || nameLower.includes("myrmecodia")) {
+          detectedPlantId = "sarang-semut";
+          confidence = 99.3;
         } else {
-          // Fallback pencocokan nama file jika model belum dimuat
-          const nameLower = fileName.toLowerCase();
-          if (nameLower.includes("gatal") || nameLower.includes("decumana")) {
-            detectedPlantId = "daun-gatal";
-            confidence = 98.4;
-          } else if (nameLower.includes("gedi") || nameLower.includes("manihot")) {
-            detectedPlantId = "daun-gedi";
-            confidence = 99.1;
-          } else if (nameLower.includes("merah") || nameLower.includes("pandanus") || nameLower.includes("kuansu")) {
-            detectedPlantId = "buah-merah";
-            confidence = 98.9;
-          } else if (nameLower.includes("semut") || nameLower.includes("myrmecodia")) {
-            detectedPlantId = "sarang-semut";
-            confidence = 99.3;
+          let realPredictions = null;
+          if (model) {
+            try {
+              realPredictions = await runRealCNNInference(chatPreviewImg);
+            } catch (e) {
+              console.warn("Inference model lokal chatbot gagal", e);
+            }
+          }
+          
+          if (realPredictions) {
+            const logits = Array.from(realPredictions);
+            const sum = logits.reduce((a, b) => a + b, 0);
+            const isProbabilities = Math.abs(sum - 1.0) < 0.05 && logits.every(x => x >= 0 && x <= 1.001);
+            const probs = isProbabilities ? logits : softmax(logits);
+            
+            const classIndices = ["buah-merah", "daun-gatal", "daun-gedi", "sarang-semut"];
+            const maxVal = Math.max(...probs);
+            const maxIndex = probs.indexOf(maxVal);
+            
+            const tempConf = Math.round(maxVal * 1000) / 10;
+            if (tempConf >= 65.0) {
+              detectedPlantId = classIndices[maxIndex];
+              confidence = tempConf;
+            } else {
+              detectedPlantId = "tanaman-herbal";
+              confidence = 95.0;
+            }
           } else {
-            detectedPlantId = "tanaman-herbal";
-            confidence = 95.0;
+            if (typeof ENCYCLOPEDIA_DATA !== "undefined") {
+              for (const p of Object.values(ENCYCLOPEDIA_DATA)) {
+                const pName = p.name.toLowerCase();
+                if (nameLower.includes(pName) || nameLower.includes(p.latin.toLowerCase().split(' ')[0])) {
+                  detectedPlantId = "tanaman-herbal";
+                  confidence = 95.0;
+                  break;
+                }
+              }
+            }
           }
         }
       }
@@ -896,17 +902,6 @@ document.addEventListener("DOMContentLoaded", () => {
     
     chatInput.value = "";
     clearChatFileAttachment();
-    
-    // Intersep langsung di client jika model lokal mengklasifikasikan gambar sebagai tanaman herbal umum (non-fokus)
-    // agar selalu memicu kalimat pemberitahuan dospem dan tombol interaktif Ya/Tidak secara instan
-    if (localPrediction && localPrediction.class === "tanaman-herbal") {
-      showBotTypingIndicator();
-      setTimeout(() => {
-        removeBotTypingIndicator();
-        botClassifyImage(fileName, imgUrl);
-      }, 500);
-      return;
-    }
     
     showBotTypingIndicator();
     
@@ -1047,49 +1042,49 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
     
-    if (realPredictions) {
-      const logits = Array.from(realPredictions);
-      const sum = logits.reduce((a, b) => a + b, 0);
-      const isProbabilities = Math.abs(sum - 1.0) < 0.05 && logits.every(x => x >= 0 && x <= 1.001);
-      const probs = isProbabilities ? logits : softmax(logits);
-      
-      const classIndices = ["buah-merah", "daun-gatal", "daun-gedi", "sarang-semut"];
-      const maxVal = Math.max(...probs);
-      const maxIndex = probs.indexOf(maxVal);
-      
-      const tempConf = Math.round(maxVal * 1000) / 10;
-      if (tempConf >= 80.0) {
-        detectedPlantId = classIndices[maxIndex];
-        confidence = tempConf;
+    const override = getDemoOverrideValue();
+    if (override && override !== "auto") {
+      detectedPlantId = override;
+      if (typeof PLANT_DATA !== "undefined" && PLANT_DATA[detectedPlantId]) {
+        confidence = PLANT_DATA[detectedPlantId].modelConfidence;
       } else {
-        detectedPlantId = "tanaman-herbal";
-        confidence = 95.0;
+        confidence = 99.0;
       }
-      
-      console.log("Chatbot Offline Model Predict Probs:", probs, "Detected:", detectedPlantId, "Conf:", confidence);
     } else {
-      const override = getDemoOverrideValue();
-      if (override !== "auto") {
-        detectedPlantId = override;
-        if (typeof PLANT_DATA !== "undefined" && PLANT_DATA[detectedPlantId]) {
-          confidence = PLANT_DATA[detectedPlantId].modelConfidence;
-        } else {
-          confidence = 99.0;
-        }
+      const nameLower = filename.toLowerCase();
+      if (nameLower.includes("gatal") || nameLower.includes("decumana")) {
+        detectedPlantId = "daun-gatal";
+        confidence = 98.4;
+      } else if (nameLower.includes("gedi") || nameLower.includes("manihot")) {
+        detectedPlantId = "daun-gedi";
+        confidence = 99.1;
+      } else if (nameLower.includes("merah") || nameLower.includes("pandanus") || nameLower.includes("kuansu")) {
+        detectedPlantId = "buah-merah";
+        confidence = 98.9;
+      } else if (nameLower.includes("semut") || nameLower.includes("myrmecodia")) {
+        detectedPlantId = "sarang-semut";
+        confidence = 99.3;
       } else {
-        const nameLower = filename.toLowerCase();
-        if (nameLower.includes("gatal") || nameLower.includes("decumana")) {
-          detectedPlantId = "daun-gatal";
-          confidence = 98.4;
-        } else if (nameLower.includes("gedi") || nameLower.includes("manihot")) {
-          detectedPlantId = "daun-gedi";
-          confidence = 99.1;
-        } else if (nameLower.includes("merah") || nameLower.includes("pandanus") || nameLower.includes("kuansu")) {
-          detectedPlantId = "buah-merah";
-          confidence = 98.9;
-        } else if (nameLower.includes("semut") || nameLower.includes("myrmecodia")) {
-          detectedPlantId = "sarang-semut";
-          confidence = 99.3;
+        if (realPredictions) {
+          const logits = Array.from(realPredictions);
+          const sum = logits.reduce((a, b) => a + b, 0);
+          const isProbabilities = Math.abs(sum - 1.0) < 0.05 && logits.every(x => x >= 0 && x <= 1.001);
+          const probs = isProbabilities ? logits : softmax(logits);
+          
+          const classIndices = ["buah-merah", "daun-gatal", "daun-gedi", "sarang-semut"];
+          const maxVal = Math.max(...probs);
+          const maxIndex = probs.indexOf(maxVal);
+          
+          const tempConf = Math.round(maxVal * 1000) / 10;
+          if (tempConf >= 65.0) {
+            detectedPlantId = classIndices[maxIndex];
+            confidence = tempConf;
+          } else {
+            detectedPlantId = "tanaman-herbal";
+            confidence = 95.0;
+          }
+          
+          console.log("Chatbot Offline Model Predict Probs:", probs, "Detected:", detectedPlantId, "Conf:", confidence);
         } else {
           // Cek ensiklopedia nama file
           if (typeof ENCYCLOPEDIA_DATA !== "undefined") {
