@@ -4,6 +4,9 @@ import json
 import urllib.request
 import os
 import re
+import subprocess
+import threading
+import time
 
 PORT = int(os.environ.get("PORT", 8000))
 
@@ -399,14 +402,54 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         super().end_headers()
 
+def start_localtunnel_and_qr():
+    time.sleep(2)
+    try:
+        print("\n[INFO] Menghubungkan ke Localtunnel untuk akses HP...", flush=True)
+        proc = subprocess.Popen(
+            ["npx", "-y", "localtunnel", "--port", "8000"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            shell=True
+        )
+        
+        url = ""
+        for line in proc.stdout:
+            print(f"[Localtunnel] {line.strip()}", flush=True)
+            if "your url is:" in line:
+                url = line.split("your url is:")[1].strip()
+                break
+                
+        if url:
+            print(f"\n==================================================", flush=True)
+            print(f"  URL Akses HP Anda: {url}", flush=True)
+            print(f"==================================================\n", flush=True)
+            
+            with open("localtunnel_url.txt", "w") as f:
+                f.write(url)
+                
+            qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={url}"
+            qr_file = os.path.join(os.path.dirname(__file__), "scan_hp_qrcode.png")
+            
+            try:
+                urllib.request.urlretrieve(qr_url, qr_file)
+                print(f"[INFO] QR Code berhasil dibuat: {qr_file}", flush=True)
+                print("[INFO] Membuka QR Code di laptop Anda... Silakan scan dengan kamera HP!", flush=True)
+                os.startfile(qr_file)
+            except Exception as qr_err:
+                print("[ERROR] Gagal mengunduh QR Code:", qr_err, flush=True)
+    except Exception as e:
+        print("[ERROR] Gagal menjalankan localtunnel:", e, flush=True)
+
 if __name__ == '__main__':
-    # Ubah direktori kerja ke folder di mana file ini berada
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     
-    # Jalankan server
     handler = MyHandler
-    # Daftarkan tipe bin secara eksplisit jika belum terdaftar
     handler.extensions_map['.bin'] = 'application/octet-stream'
+    
+    # Jalankan localtunnel dan QR code otomatis di background thread
+    threading.Thread(target=start_localtunnel_and_qr, daemon=True).start()
     
     with socketserver.TCPServer(("", PORT), handler) as httpd:
         print(f"Server berjalan di port {PORT}...")
