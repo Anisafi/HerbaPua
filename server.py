@@ -414,7 +414,7 @@ def start_localtunnel_and_qr():
                 
         # Jalankan localtunnel dan arahkan stdout ke file langsung
         proc = subprocess.Popen(
-            r'cmd.exe /c "node node_modules\localtunnel\bin\lt.js --port 8000 > localtunnel_url.txt"',
+            r'cmd.exe /c "node node_modules\localtunnel\bin\lt.js --port 8000 > localtunnel_url.txt 2>&1"',
             shell=True
         )
         
