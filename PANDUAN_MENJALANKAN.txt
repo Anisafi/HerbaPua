@@ -1,0 +1,79 @@
+========================================================================
+             PANDUAN MENJALANKAN APLIKASI WEB HERBAPUA
+========================================================================
+
+Dokumen ini berisi panduan lengkap untuk menjalankan website HerbaPua, 
+mengatur API Key Gemini, serta cara mengaksesnya dari Handphone (HP).
+
+------------------------------------------------------------------------
+CARA 1: MENJALANKAN SECARA INSTAN (SANGAT DIREKOMENDASIKAN)
+------------------------------------------------------------------------
+Anda tidak perlu mengetik perintah apa pun di terminal. Cukup:
+1. Buka folder "C:\SKRIPSI" di File Explorer laptop Anda.
+2. Klik dua kali (double click) pada file bernama:
+   "JALANKAN_WEBSITE.bat"
+3. Halaman website HerbaPua akan otomatis terbuka di browser Anda 
+   (alamat: http://localhost:8000/app/index.html).
+4. PENTING: Jangan menutup jendela hitam (Command Prompt) yang muncul. 
+   Jendela tersebut adalah server backend Python yang melayani chatbot. 
+   Jika ditutup, chatbot tidak akan merespon.
+
+------------------------------------------------------------------------
+CARA 2: MENJALANKAN LEWAT VISUAL STUDIO CODE (VS CODE)
+------------------------------------------------------------------------
+Jika Anda sedang membuka proyek di VS Code dan ingin menjalankannya:
+1. Buka VS Code, pilih "File" -> "Open Folder" -> pilih "C:\SKRIPSI".
+2. Buka terminal bawaan VS Code dengan menekan tombol tombol keyboard:
+   Ctrl + ` (tombol di bawah Esc) atau klik menu "Terminal" -> "New Terminal".
+3. Di dalam terminal, ketik perintah berikut lalu tekan Enter:
+   python server.py
+4. Buka browser favorit Anda (Chrome/Edge/Firefox), lalu ketik alamat:
+   http://localhost:8000/app/index.html
+5. Untuk mematikan server, tekan tombol Ctrl + C di terminal VS Code.
+
+------------------------------------------------------------------------
+CARA 3: MENGAKSES LEWAT HANDPHONE (HP) - JARINGAN WIFI YANG SAMA
+------------------------------------------------------------------------
+Agar dosen penguji atau Anda sendiri bisa mencoba aplikasi dari HP:
+1. Pastikan laptop Anda dan HP terhubung ke jaringan Wi-Fi yang SAMA.
+2. Cari tahu IP Address laptop Anda:
+   - Buka Command Prompt (CMD) di laptop.
+   - Ketik: ipconfig lalu tekan Enter.
+   - Cari baris bernama "IPv4 Address" (misalnya: 192.168.1.15).
+3. Jalankan server Python di laptop (menggunakan Cara 1 atau Cara 2).
+4. Di HP Anda, buka browser lalu ketik alamat IP laptop tersebut diikuti port 8000:
+   http://[IP_LAPTOP_ANDA]:8000/app/index.html
+   Contoh: http://192.168.1.15:8000/app/index.html
+
+------------------------------------------------------------------------
+CARA 4: MENGAKSES LEWAT HANDPHONE DENGAN FITUR KAMERA/PINDAI AKTIF (HTTPS)
+------------------------------------------------------------------------
+Browser HP melarang akses kamera pada alamat "http" biasa (harus menggunakan koneksi aman "https"). 
+Untuk mendapatkan link "https" gratis agar fitur pemindaian kamera HP Anda aktif:
+1. Jalankan server Python di laptop (menggunakan Cara 1 atau Cara 2).
+2. Buka Command Prompt (CMD) baru, lalu ketik perintah berikut:
+   npx localtunnel --port 8000
+3. Anda akan mendapatkan tautan/URL aman di layar CMD (misalnya: https://good-leaves-fly.localtunnel.me).
+4. Buka tautan tersebut di HP Anda. Jika muncul halaman peringatan keamanan 
+   klik tombol "Click to Continue" / "Bypass" untuk masuk ke web HerbaPua.
+5. Sekarang, fitur kamera/pindai langsung di HP Anda sudah aktif secara penuh!
+
+------------------------------------------------------------------------
+MENGATUR API KEY GEMINI (JIKA TERKENA RATE LIMIT 429)
+------------------------------------------------------------------------
+Semua API Key Gemini diletakkan di dalam file "config.json" di folder utama. 
+Kami sudah memasang sistem rotasi kunci otomatis. Jika ingin menambah atau 
+mengganti kunci cadangan:
+1. Buka file "config.json" di VS Code atau Notepad.
+2. Formatnya adalah sebagai berikut:
+   {
+     "GEMINI_API_KEY": [
+       "KUNCI_API_PERTAMA_ANDA",
+       "KUNCI_API_KEDUA_ANDA"
+     ]
+   }
+3. Cukup simpan file tersebut setelah diedit, server akan langsung menerapkannya.
+
+========================================================================
+                    HerbaPua - 2026 | Papua Barat Daya
+========================================================================
