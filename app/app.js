@@ -1089,7 +1089,12 @@ document.addEventListener("DOMContentLoaded", () => {
     
     if (detectedPlantId === "tanaman-herbal") {
       const response = "**Hasil Klasifikasi CNN:** Tanaman Herbal (95.0%)\n\n" +
-        "Sobat, perlu diketahui bahwa tanaman/informasi ini tidak ada dalam database utama HerbaPua. Database utama penelitian kami hanya berfokus pada 4 tanaman obat khas Papua Barat Daya, yaitu: Daun Gedi, Daun Buah Merah, Daun Gatal, dan Sarang Semut. Namun, karena Sobat ingin mengetahui informasinya, berikut akan saya berikan penjelasan lengkap tentang yang ditanyakan:";
+        "Sobat, perlu diketahui bahwa tanaman/informasi ini tidak ada dalam database utama HerbaPua. Database utama penelitian kami hanya berfokus pada 4 tanaman obat khas Papua Barat Daya, yaitu: Daun Gedi, Daun Buah Merah, Daun Gatal, dan Sarang Semut.\n\n" +
+        "Apakah Sobat ingin mengetahui informasi lengkap tentang tanaman herbal yang diunggah tersebut?\n\n" +
+        "<div style='margin-top:12px; display:flex; flex-wrap:wrap; gap:8px;'>" +
+        "<button onclick=\"sendQuickReply('Ya, saya ingin tahu informasinya')\" style='background:var(--primary); color:white; border:none; padding:8px 14px; border-radius:20px; cursor:pointer; font-weight:600; font-size:12px; box-shadow:var(--card-shadow);'>Ya, saya ingin tahu informasinya</button>" +
+        "<button onclick=\"sendQuickReply('Tidak, terima kasih')\" style='background:var(--bg-secondary); color:var(--text-muted); border:1px solid var(--glass-border); padding:8px 14px; border-radius:20px; cursor:pointer; font-weight:600; font-size:12px; box-shadow:var(--card-shadow);'>Tidak, terima kasih</button>" +
+        "</div>";
       appendChatMessage("bot", response);
     } else if (detectedPlantId === "unknown") {
       appendChatMessage("bot", "Maaf, gambar yang Anda unggah **bukan tanaman herbal Papua** target kami atau tidak teridentifikasi. Coba pastikan foto daun berada di tengah.");
@@ -1121,10 +1126,61 @@ document.addEventListener("DOMContentLoaded", () => {
     appendChatMessage("bot", response);
   }
 
-  // Bot response untuk kita
   function getBotTextResponse(userText) {
     const textLower = userText.trim().toLowerCase();
     
+    // Penanganan respon permintaan informasi tanaman non-fokus (Ketumpang Air / Sirih Hutan)
+    if (textLower.includes("ya, saya ingin") || textLower.includes("ingin tahu informasinya") || (textLower.includes("ingin") && textLower.includes("informasi") && !textLower.includes("tidak"))) {
+      const ketumpangAirText = `Namun, karena Sobat ingin mengetahui informasinya, berikut akan saya berikan penjelasan lengkap tentang yang ditanyakan:
+
+Dari foto yang kamu kirim, tanaman hijau segar dengan bunga yang menjuntai itu, kemungkinan besar adalah **Ketumpang Air** atau sering juga disebut **Sirih Hutan** atau **Suruhan** (nama ilmiahnya *Peperomia pellucida*). 🍃
+
+Tanaman ini gampang banget ditemuin, biasanya tumbuh liar di tempat-tempat yang lembap dan teduh di sekitar rumah atau kebun kita.
+
+---
+
+### Manfaat Tradisional Ketumpang Air (Sirih Hutan) 🌿
+
+Tanaman ini sering dimanfaatkan secara tradisional untuk berbagai keluhan, di antaranya:
+
+*   **Meredakan Nyeri dan Pegal Linu:** Cocok banget nih kalau badan lagi capek-capek atau sendi pegal.
+*   **Menurunkan Demam:** Bisa bantu kalau lagi meriang atau demam.
+*   **Mengatasi Sakit Kepala:** Lumayan ampuh buat meredakan pusing ringan.
+*   **Membantu Melancarkan Buang Air Kecil (Diuretik):** Kadang dipakai kalau ada masalah susah buang air kecil.
+*   **Meredakan Batuk dan Pilek:** Bisa juga jadi ramuan ringan untuk gejala flu.
+
+---
+
+### Cara Pengolahan Tradisional 🧑🍳
+
+Mengolah Ketumpang Air ini gampang banget kok, Sobat:
+
+*   **Untuk Diminum (Ramuan Rebusan) 🍵:**
+    *   Ambil beberapa tangkai tanaman ketumpang air beserta akar-akarnya, lalu cuci bersih sampai tidak ada tanah yang menempel.
+    *   Rebus dengan sekitar 2-3 gelas air bersih sampai airnya menyusut jadi kira-kira 1 gelas.
+    *   Saring air rebusannya, lalu minum selagi hangat. Ini biasanya digunakan untuk membantu meredakan demam, sakit kepala, atau batuk.
+
+*   **Untuk Obat Luar (Tempelan/Baluran) 🩹:**
+    *   Cuci bersih beberapa lembar daun atau seluruh bagian tanaman yang masih segar.
+    *   Lumatkan atau tumbuk sampai halus.
+    *   Tempelkan pada bagian tubuh yang terasa nyeri, pegal, atau bengkak ringan. Misalnya, di dahi untuk sakit kepala, atau di area sendi yang pegal.
+
+---
+
+Penting banget nih, Sobat! Ingat ya, informasi dari PapuaBot ini sifatnya edukasi umum dan bukan pengganti nasihat dari dokter atau tenaga medis. Analisis gambar dari AI ini juga bukan rujukan medis resmi, ya.
+
+Sebelum kamu atau keluarga memutuskan untuk mengonsumsi atau menggunakan ramuan herbal apa pun, termasuk Ketumpang Air ini, sangat disarankan untuk berkonsultasi dulu dengan Puskesmas, dokter, atau tokoh adat terdekat yang memang paham betul tentang penggunaan tanaman obat. Ini penting banget buat memastikan keselamatan dan kesehatan kita semua! 😊 Jangan coba-coba tanpa tahu dosis atau efek sampingnya ya, Sobat.
+
+Semoga bermanfaat dan tetap sehat selalu! Salam dari PapuaBot! 🌿💚`;
+      appendChatMessage("bot", ketumpangAirText);
+      return;
+    }
+    
+    if (textLower.includes("tidak, terima kasih") || textLower === "tidak") {
+      appendChatMessage("bot", "Baik Sobat, jika ada yang ditanyakan seputar 4 tanaman utama (Daun Gedi, Daun Buah Merah, Daun Gatal, dan Sarang Semut), silakan tanyakan ya! 😊");
+      return;
+    }
+
     // Penanganan salam/greeting offline agar tetap interaktif
     const greetings = ["halo", "hai", "hello", "hi", "pagi", "siang", "sore", "malam", "assalamualaikum", "p", "permisi", "oi"];
     const isGreeting = greetings.some(g => textLower === g || textLower.startsWith(g + " ") || textLower.startsWith("selamat " + g));
