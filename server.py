@@ -407,7 +407,7 @@ def start_localtunnel_and_qr():
     try:
         print("\n[INFO] Menghubungkan ke Localtunnel untuk akses HP...", flush=True)
         proc = subprocess.Popen(
-            "node node_modules/localtunnel/bin/lt.js --port 8000",
+            r"node node_modules\localtunnel\bin\lt.js --port 8000",
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True,
