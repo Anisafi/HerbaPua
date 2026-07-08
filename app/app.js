@@ -905,40 +905,97 @@ document.addEventListener("DOMContentLoaded", () => {
     
     showBotTypingIndicator();
     
-    try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: text || "Bantu klasifikasikan gambar daun herbal ini.",
-          image: imgUrl,
-          local_prediction: localPrediction
-        })
-      });
-      
-      removeBotTypingIndicator();
-      
-      if (!response.ok) throw new Error("HTTP error");
-      
-      const data = await response.json();
-      if (data && data.reply && !data.reply.includes("belum dikonfigurasi") && !data.reply.includes("Gagal menghubungi Gemini API")) {
-        appendChatMessage("bot", data.reply);
-      } else {
-        console.warn("Backend API tidak siap. Menggunakan fallback offline...");
-        if (imgUrl) {
-          botClassifyImage(fileName, imgUrl);
+    if (imgUrl) {
+      // PROSES DENGAN GAMBAR: Hubungi backend /api/classify terlebih dahulu untuk mengenali visual gambarnya secara daring
+      try {
+        const classifyResponse = await fetch("/api/classify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image: imgUrl })
+        });
+        
+        if (!classifyResponse.ok) throw new Error("Classify API failed");
+        
+        const classifyData = await classifyResponse.json();
+        console.log("Chatbot online image classification result:", classifyData);
+        
+        // Periksa kelas klasifikasi visual yang dihasilkan oleh Gemini Vision
+        const detectedClass = classifyData.class || "unknown";
+        const detectedConf = classifyData.confidence || 95.0;
+        
+        if (detectedClass === "tanaman-herbal") {
+          // Selalu munculkan dospem warning + tombol Ya/Tidak untuk herbal umum (non-fokus)
+          removeBotTypingIndicator();
+          
+          window.lastOfflineImage = imgUrl;
+          window.lastOfflineFilename = fileName;
+          
+          const htmlContent = `
+            <strong>Hasil Klasifikasi CNN:</strong> Tanaman Herbal (${detectedConf.toFixed(1)}%)<br><br>
+            Sobat, perlu diketahui bahwa tanaman/informasi ini tidak ada dalam database utama HerbaPua. Database utama penelitian kami hanya berfokus pada 4 tanaman obat khas Papua Barat Daya, yaitu: Daun Gedi, Daun Buah Merah, Daun Gatal, dan Sarang Semut. Namun, jika Sobat ingin tahu informasinya, maka akan saya berikan yaa.<br><br>
+            <div class="chat-choice-buttons" style="display: flex; gap: 10px; margin-top: 10px;">
+              <button onclick="window.handleOfflinePlantChoice(true)" style="background: var(--primary); color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; transition: all 0.2s;">Ya, saya ingin tahu</button>
+              <button onclick="window.handleOfflinePlantChoice(false)" style="background: #e2e8f0; color: #475569; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 500; transition: all 0.2s;">Tidak, terima kasih</button>
+            </div>
+          `;
+          appendChatMessage("bot", htmlContent);
+          return;
+        } else if (detectedClass === "unknown") {
+          removeBotTypingIndicator();
+          appendChatMessage("bot", "Maaf, gambar yang Anda unggah bukan tanaman herbal target kami atau tidak teridentifikasi. Coba pastikan foto daun berada di tengah.");
+          return;
+        } else {
+          // Jika kelasnya adalah salah satu dari 4 tanaman fokus riset utama
+          // Lanjutkan memanggil /api/chat untuk mendapatkan penjelasan khasiat lengkap dari Gemini
+          const response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: text || `Jelaskan khasiat dan pengolahan tradisional untuk tanaman ${detectedClass} ini.`,
+              image: imgUrl,
+              local_prediction: { class: detectedClass, confidence: detectedConf }
+            })
+          });
+          
+          removeBotTypingIndicator();
+          if (!response.ok) throw new Error("Chat API failed");
+          
+          const chatData = await response.json();
+          if (chatData && chatData.reply && !chatData.reply.includes("belum dikonfigurasi") && !chatData.reply.includes("Gagal menghubungi Gemini API")) {
+            appendChatMessage("bot", chatData.reply);
+          } else {
+            botClassifyImage(fileName, imgUrl);
+          }
+        }
+      } catch (err) {
+        console.warn("Gagal klasifikasi/chat daring, fallback ke model lokal:", err);
+        removeBotTypingIndicator();
+        botClassifyImage(fileName, imgUrl);
+      }
+    } else {
+      // PROSES HANYA TEKS: Langsung kirim pesan ke /api/chat
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: text,
+            local_prediction: null
+          })
+        });
+        
+        removeBotTypingIndicator();
+        if (!response.ok) throw new Error("Chat API failed");
+        
+        const chatData = await response.json();
+        if (chatData && chatData.reply && !chatData.reply.includes("belum dikonfigurasi") && !chatData.reply.includes("Gagal menghubungi Gemini API")) {
+          appendChatMessage("bot", chatData.reply);
         } else {
           getBotTextResponse(text);
         }
-      }
-    } catch (err) {
-      console.error("Gagal menghubungi API chat backend. Fallback ke lokal:", err);
-      removeBotTypingIndicator();
-      if (imgUrl) {
-        botClassifyImage(fileName, imgUrl);
-      } else {
+      } catch (err) {
+        console.warn("Gagal mengirim pesan chat, fallback ke teks lokal:", err);
+        removeBotTypingIndicator();
         getBotTextResponse(text);
       }
     }
