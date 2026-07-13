@@ -501,6 +501,7 @@ if __name__ == '__main__':
     # Jalankan localtunnel dan QR code otomatis di background thread
     threading.Thread(target=start_localtunnel_and_qr, daemon=True).start()
     
+    socketserver.TCPServer.allow_reuse_address = True
     with socketserver.TCPServer(("", PORT), handler) as httpd:
         print(f"Server berjalan di port {PORT}...")
         try:
