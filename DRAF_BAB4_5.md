@@ -120,6 +120,32 @@ Pengujian dilakukan untuk menjamin kualitas fungsional dan penerimaan pengguna:
 #### B. Pengujian Kepuasan Pengguna (Usability Testing / SUS)
 Ketergunaan website diuji oleh 15 responden (pengguna umum) menggunakan kuesioner **System Usability Scale (SUS)** dengan 10 butir pertanyaan standar. Hasil pengujian menghasilkan skor rata-rata **82,5**, yang menurut skala penilaian SUS masuk ke dalam kategori **"Excellent"** (Sangat Baik) dengan tingkat penerimaan (*Acceptability*) yang tinggi.
 
+#### C. Uji Validasi Ahli (TKT 4)
+Untuk mengukur kelayakan produk sebelum diuji coba ke masyarakat, dilakukan uji validasi oleh para ahli (materi, platform, dan media/UI/UX). Uji validasi ini menggunakan kuesioner penilaian kelayakan dengan skala Likert 1-4. Berikut adalah rincian hasil validasi:
+
+##### 1. Hasil Validasi Ahli Materi
+Validasi ahli materi berfokus pada kualitas kebahasaan, standar isi informasi obat, dan aspek pembelajaran pada website HerbaPua.
+* **Aspek Kebahasaan**: Rata-rata skor Validator 1 (3,75) dan Validator 2 (3,75).
+* **Aspek Standar Isi**: Rata-rata skor Validator 1 (3,50) dan Validator 2 (3,75).
+* **Aspek Pembelajaran**: Rata-rata skor Validator 1 (4,00) dan Validator 2 (4,00).
+* **Rata-rata Gabungan Ahli Materi**: **3,79 dari 4,00** (Tingkat Kelayakan: **94,75%** / **Sangat Layak**).
+
+##### 2. Hasil Validasi Ahli Platform
+Validasi ahli platform dilakukan oleh **Ermin** (NIP/NIDN: 1403129601) dari Universitas Muhammadiyah Sorong untuk menilai aspek teknis serverless web.
+* **Aspek Kinerja Platform**: Rata-rata skor Validator 1 (3,75) dan Validator 2 (3,75).
+* **Aspek Keamanan Platform**: Rata-rata skor Validator 1 (3,25) dan Validator 2 (3,75).
+* **Aspek Kompatibilitas Platform**: Rata-rata skor Validator 1 (4,00) dan Validator 2 (3,75).
+* **Rata-rata Gabungan Ahli Platform**: **3,71 dari 4,00** (Tingkat Kelayakan: **92,75%** / **Sangat Layak**).
+* **Kesimpulan Kualitatif**: Prototipe dapat digunakan **tanpa revisi**.
+
+##### 3. Hasil Validasi Ahli UI/UX dan Media
+Validasi ahli media dilakukan oleh **Nur Miswar, S.Kom., M.Kom** (NIP/NIDN: 1431079601) dari Universitas Muhammadiyah Sorong untuk menilai rekayasa perangkat lunak dan keindahan antarmuka web.
+* **Aspek Umum**: Rata-rata skor Validator 1 (3,75) dan Validator 2 (3,75).
+* **Aspek Rekayasa Perangkat Lunak**: Rata-rata skor Validator 1 (3,75) dan Validator 2 (3,75).
+* **Aspek Tampilan (UI/UX)**: Rata-rata skor Validator 1 (3,67) dan Validator 2 (3,67).
+* **Rata-rata Gabungan Ahli Media**: **3,72 dari 4,00** (Tingkat Kelayakan: **93,00%** / **Sangat Layak**).
+* **Kesimpulan Kualitatif**: Prototipe dapat digunakan **tanpa revisi**.
+
 ---
 ---
 
