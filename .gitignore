@@ -30,3 +30,8 @@ __pycache__/
 # Mengabaikan OS metadata
 .DS_Store
 Thumbs.db
+
+# Mengabaikan berkas lembar validasi lokal
+LEMBAR_VALIDASI_AHLI_PLATFORM.md
+LEMBAR_VALIDASI_AHLI_MEDIA.md
+
