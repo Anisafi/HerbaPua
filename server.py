@@ -8,7 +8,7 @@ import subprocess
 import threading
 import time
 
-PORT = int(os.environ.get("PORT", 8000))
+PORT = int(os.environ.get("PORT", 8080))
 
 def load_config():
     config_path = os.path.join(os.path.dirname(__file__), 'config.json')
@@ -420,7 +420,7 @@ def start_localtunnel_and_qr():
     # 1. BUAT QR CODE LOKAL (Wi-Fi) TERLEBIH DAHULU (Instan & Bebas Internet)
     try:
         local_ip = get_local_ip()
-        local_url = f"http://{local_ip}:8000/app/index.html"
+        local_url = f"http://{local_ip}:{PORT}/app/index.html"
         print(f"\n[INFO] IP Lokal Wi-Fi Anda: {local_ip}")
         print(f"[INFO] Tautan Lokal HP: {local_url}")
         
@@ -446,7 +446,7 @@ def start_localtunnel_and_qr():
                 
         # Jalankan localtunnel dan arahkan stdout ke file absolut langsung
         proc = subprocess.Popen(
-            f'cmd.exe /c "node node_modules\\localtunnel\\bin\\lt.js --port 8000 > {url_file_path} 2>&1"',
+            f'cmd.exe /c "node node_modules\\localtunnel\\bin\\lt.js --port {PORT} > {url_file_path} 2>&1"',
             shell=True
         )
         
