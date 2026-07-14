@@ -19,7 +19,7 @@ const PLANT_DATA = {
       "Membantu meredakan demam dan sakit kepala ringan dengan menempelkan daun di dahi."
     ],
     usage: "Ambil selembar daun gatal segar. Usapkan atau tepuk-tepuk secara perlahan permukaan daun yang berbulu ke area tubuh yang terasa pegal atau nyeri (misalnya kaki, punggung, atau lengan). Sensasi gatal dan panas akan terasa selama beberapa menit, namun setelah itu otot akan terasa sangat rileks dan rasa sakit akan mereda.",
-    sampleImage: "../daun gatal/daun_gatal_new.jpg",
+    sampleImage: "./daun_gatal_new.jpg",
     modelConfidence: 98.4
   },
   "buah-merah": {
@@ -37,7 +37,7 @@ const PLANT_DATA = {
       "Kaya akan asam lemak esensial (omega-3 dan omega-9) untuk kesehatan pembuluh darah dan jantung."
     ],
     usage: "Bagian daging buah merah dikukus atau direbus terlebih dahulu, kemudian diperas dan disaring untuk mendapatkan minyak kental berwarna merah tua (sari buah merah). Sari minyak ini dikonsumsi langsung (1-2 sendok makan per hari) atau dicampurkan ke dalam makanan sebagai suplemen tambahan.",
-    sampleImage: "../daun buah merah/buah_merah_new.jpg",
+    sampleImage: "./buah_merah_new.jpg",
     modelConfidence: 97.6
   },
   "daun-gedi": {
@@ -55,7 +55,7 @@ const PLANT_DATA = {
       "Kaya akan kalsium, Vitamin A, dan Vitamin C yang menunjang kesehatan tulang dan mata."
     ],
     usage: "Untuk pengobatan maag atau asam lambung, rebus 5-10 lembar daun gedi segar dengan 2 gelas air hingga tersisa 1 gelas. Saring air rebusannya lalu minum selagi hangat secara teratur. Daun gedi juga bisa langsung dimasak sebagai tumisan sehat atau bahan pelengkap makanan pokok tradisional.",
-    sampleImage: "../daun gedi/daun_gedi_new.jpg",
+    sampleImage: "./daun_gedi_new.jpg",
     modelConfidence: 96.8
   },
   "sarang-semut": {
@@ -72,7 +72,7 @@ const PLANT_DATA = {
       "Kaya akan kandungan flavonoid dan tanin yang berfungsi sebagai antioksidan kuat dan anti-bakteri alami."
     ],
     usage: "Iris umbi sarang semut tipis-tipis dan keringkan di bawah sinar matahari hingga benar-benar kering. Rebus sekitar 10-15 gram irisan kering sarang semut dengan 3 gelas air hingga mendidih dan menyusut menjadi sekitar 1-2 gelas. Saring air rebusannya dan minum secara teratur 2-3 kali sehari hangat-hangat.",
-    sampleImage: "../sarang semut/sarang_semut_new.jpg",
+    sampleImage: "./sarang_semut_new.jpg",
     modelConfidence: 99.1
   }
 };
@@ -697,7 +697,7 @@ const ENCYCLOPEDIA_DATA = {
       "Membantu meringankan kondisi penderita HIV/AIDS."
     ],
     usage: "Daging buah merah dikukus atau direbus, diperas dan disaring untuk diambil minyak merahnya (sari buah merah). Minyak ini dikonsumsi langsung 1-2 sendok makan setiap hari.",
-    sampleImage: "../daun buah merah/IMG_20260526_141808.jpg"
+    sampleImage: "./IMG_20260526_141808.jpg"
   },
   "41": {
     id: "41",
