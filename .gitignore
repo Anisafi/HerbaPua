@@ -35,3 +35,7 @@ Thumbs.db
 LEMBAR_VALIDASI_AHLI_PLATFORM.md
 LEMBAR_VALIDASI_AHLI_MEDIA.md
 
+# Pengecualian berkas kebutuhan pustaka Vercel
+!requirements.txt
+!api/requirements.txt
+
