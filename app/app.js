@@ -599,12 +599,10 @@ document.addEventListener("DOMContentLoaded", () => {
           } else {
             const errText = await response.text();
             console.warn("Backend API classify returned non-OK:", response.status, errText);
-            alert("Eror Server Backend (Status " + response.status + "): " + errText);
           }
         }
       } catch (err) {
         console.warn("Backend classify API failed/offline. Falling back to local model...", err);
-        alert("Koneksi API Gagal: " + err.message);
       }
     }
     
