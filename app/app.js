@@ -530,7 +530,8 @@ document.addEventListener("DOMContentLoaded", () => {
         if (imgSource.tagName === "IMG") {
           imgDataUrl = imgSource.src;
         } else if (imgSource.tagName === "CANVAS") {
-          imgDataUrl = imgSource.toDataURL("image/jpeg");
+          const rawDataUrl = imgSource.toDataURL("image/jpeg");
+          imgDataUrl = await compressAndResizeImage(rawDataUrl);
         }
         
         if (imgDataUrl) {
