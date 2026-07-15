@@ -53,6 +53,8 @@ def get_api_keys(config):
     return keys
 
 def parse_data_url(data_url):
+    if not data_url or not isinstance(data_url, str):
+        return None, None
     m = re.match(r'^data:([^;]+);base64,(.+)$', data_url)
     if m:
         return m.group(1), m.group(2)
@@ -358,44 +360,53 @@ def call_gemini_classify(api_key, image_data_url):
 
 class MyHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
-        if self.path == '/api/chat':
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-            req_body = json.loads(post_data.decode('utf-8'))
-            
-            config = load_config()
-            api_keys = get_api_keys(config)
-            
-            response_data = call_gemini_api(
-                api_keys, 
-                req_body.get('message', ''), 
-                req_body.get('image'),
-                req_body.get('local_prediction')
-            )
-            
-            self.send_response(200)
+        try:
+            if self.path == '/api/chat':
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                req_body = json.loads(post_data.decode('utf-8'))
+                
+                config = load_config()
+                api_keys = get_api_keys(config)
+                
+                response_data = call_gemini_api(
+                    api_keys, 
+                    req_body.get('message', ''), 
+                    req_body.get('image'),
+                    req_body.get('local_prediction')
+                )
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps(response_data).encode('utf-8'))
+            elif self.path == '/api/classify':
+                content_length = int(self.headers['Content-Length'])
+                post_data = self.rfile.read(content_length)
+                req_body = json.loads(post_data.decode('utf-8'))
+                
+                config = load_config()
+                api_keys = get_api_keys(config)
+                
+                response_data = call_gemini_classify(
+                    api_keys, 
+                    req_body.get('image')
+                )
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps(response_data).encode('utf-8'))
+            else:
+                self.send_error(404, "File not found")
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            self.send_response(500)
             self.send_header('Content-Type', 'application/json')
             self.end_headers()
-            self.wfile.write(json.dumps(response_data).encode('utf-8'))
-        elif self.path == '/api/classify':
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-            req_body = json.loads(post_data.decode('utf-8'))
-            
-            config = load_config()
-            api_keys = get_api_keys(config)
-            
-            response_data = call_gemini_classify(
-                api_keys, 
-                req_body.get('image')
-            )
-            
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(response_data).encode('utf-8'))
-        else:
-            self.send_error(404, "File not found")
+            err_resp = {"class": "unknown", "confidence": 0, "reply": f"Internal Server Error: {str(e)}", "error": str(e)}
+            self.wfile.write(json.dumps(err_resp).encode('utf-8'))
 
     # Pastikan file static terlayani dengan benar
     def end_headers(self):

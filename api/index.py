@@ -58,6 +58,8 @@ def get_api_keys(config):
     return keys
 
 def parse_data_url(data_url):
+    if not data_url or not isinstance(data_url, str):
+        return None, None
     m = re.match(r'^data:([^;]+);base64,(.+)$', data_url)
     if m:
         return m.group(1), m.group(2)
@@ -311,29 +313,39 @@ def call_gemini_classify(api_keys, image_data_url):
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
-    req_body = request.get_json() or {}
-    config = load_config()
-    api_keys = get_api_keys(config)
-    
-    response_data = call_gemini_api(
-        api_keys, 
-        req_body.get('message', ''), 
-        req_body.get('image'),
-        req_body.get('local_prediction')
-    )
-    return jsonify(response_data)
+    try:
+        req_body = request.get_json(silent=True) or {}
+        config = load_config()
+        api_keys = get_api_keys(config)
+        
+        response_data = call_gemini_api(
+            api_keys, 
+            req_body.get('message', ''), 
+            req_body.get('image'),
+            req_body.get('local_prediction')
+        )
+        return jsonify(response_data)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"reply": f"Gagal memproses obrolan (Backend Error): {str(e)}"}), 500
 
 @app.route('/api/classify', methods=['POST'])
 def classify():
-    req_body = request.get_json() or {}
-    config = load_config()
-    api_keys = get_api_keys(config)
-    
-    response_data = call_gemini_classify(
-        api_keys, 
-        req_body.get('image')
-    )
-    return jsonify(response_data)
+    try:
+        req_body = request.get_json(silent=True) or {}
+        config = load_config()
+        api_keys = get_api_keys(config)
+        
+        response_data = call_gemini_classify(
+            api_keys, 
+            req_body.get('image')
+        )
+        return jsonify(response_data)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"class": "unknown", "confidence": 0, "error": str(e)}), 500
 
 # Kebutuhan untuk Vercel Serverless Function
 if __name__ == '__main__':
