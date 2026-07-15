@@ -316,8 +316,7 @@ document.addEventListener("DOMContentLoaded", () => {
         benefits: [
           "Halaman Beranda: Menampilkan kartu dari 4 tanaman herbal utama riset (Daun Gedi, Daun Gatal, Buah Merah, Sarang Semut). Klik langsung pada kartu tanaman untuk membaca deskripsi botani, khasiat, dan cara pengolahannya secara lengkap.",
           "Konsultasi PapuaBot: Terletak di bagian bawah Halaman Beranda. Anda bisa mengetik pertanyaan secara interaktif seputar resep herbal Papua Barat Daya atau mengklik ikon '+' untuk mengunggah gambar daun tanaman guna dianalisis oleh chatbot AI.",
-          "Halaman Pindai (Scan): Klik menu 'Pindai' di navigasi bawah untuk membuka kamera. Izinkan akses kamera browser, posisikan daun tanaman di tengah bingkai, lalu klik ikon kamera bulat di tengah bawah untuk mendeteksi. Anda juga bisa mengunggah file foto dari tombol galeri di sebelah kanannya.",
-          "Sistem Klasifikasi Cerdas: Sistem dapat mendeteksi 4 tanaman herbal fokus riset, tanaman herbal umum lainnya di luar riset (label: Tanaman Herbal), serta menolak objek mati atau gambar acak yang bukan tanaman (label: Gambar Tidak Dikenal)."
+          "Halaman Pindai (Scan): Klik menu 'Pindai' di navigasi bawah untuk membuka kamera. Izinkan akses kamera browser, posisikan daun tanaman di tengah bingkai, lalu klik ikon kamera bulat di tengah bawah untuk mendeteksi. Anda juga bisa mengunggah file foto dari tombol galeri di sebelah kanannya."
         ],
         usage: "Untuk hasil pemindaian terbaik, pastikan foto daun diambil dengan cahaya yang cukup, fokus yang tajam, dan helai daun terlihat jelas. Selalu konsultasikan penggunaan ramuan herbal dengan dokter atau tenaga medis profesional."
       };
