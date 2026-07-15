@@ -312,7 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
         localName: "Sistem Klasifikasi & Edukasi Herbal",
         modelConfidence: null,
         sampleImage: "",
-        description: "Aplikasi HerbaPua merupakan platform digital terpadu untuk melestarikan resep dan pengetahuan pengobatan tradisional khas Papua Barat Daya. Sistem ini didukung oleh kecerdasan buatan berbasis deep learning (MobileNetV2 & Gemini API) untuk klasifikasi tanaman obat serta ensiklopedia botani digital yang informatif.",
+        description: "Aplikasi HerbaPua merupakan platform digital terpadu untuk melestarikan resep dan pengetahuan pengobatan tradisional khas Papua Barat Daya. Sistem ini didukung oleh kecerdasan buatan berbasis deep learning (MobileNetV2) untuk klasifikasi tanaman obat serta ensiklopedia botani digital yang informatif.",
         benefits: [
           "Halaman Beranda: Menampilkan kartu dari 4 tanaman herbal utama riset (Daun Gedi, Daun Gatal, Buah Merah, Sarang Semut). Klik langsung pada kartu tanaman untuk membaca deskripsi botani, khasiat, dan cara pengolahannya secara lengkap.",
           "Konsultasi PapuaBot: Terletak di bagian bawah Halaman Beranda. Anda bisa mengetik pertanyaan secara interaktif seputar resep herbal Papua Barat Daya atau mengklik ikon '+' untuk mengunggah gambar daun tanaman guna dianalisis oleh chatbot AI.",
