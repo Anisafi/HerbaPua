@@ -544,7 +544,7 @@ document.addEventListener("DOMContentLoaded", () => {
           
           if (response.ok) {
             const data = await response.json();
-            if (data && data.class && data.class !== "unknown") {
+            if (data && data.class) {
               apiPlantId = data.class;
               apiConfidence = data.confidence;
               console.log("Backend Gemini Classification success:", apiPlantId, apiConfidence);
@@ -655,10 +655,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const showDetails = isFocusPlant && isReliable;
 
     if (detectedPlantId === "unknown") {
-      if (resPlantName) resPlantName.innerText = "Tanaman Tidak Dikenal";
-      if (resPlantLatin) resPlantLatin.innerText = "Bukan bagian dari 4 target herbal";
-      if (resAccuracyVal) resAccuracyVal.innerText = "N/A";
+      if (resPlantName) resPlantName.innerText = "Gambar Tidak Dikenal";
+      if (resPlantLatin) resPlantLatin.innerText = "Bukan Tanaman Herbal";
+      if (resAccuracyVal) resAccuracyVal.innerText = "0%";
       confidence = 0;
+    } else if (detectedPlantId === "tanaman-herbal") {
+      if (resPlantName) resPlantName.innerText = "Tanaman Herbal";
+      if (resPlantLatin) resPlantLatin.innerText = "Di luar 4 fokus utama riset";
+      if (resAccuracyVal) resAccuracyVal.innerText = `${confidence}%`;
     } else if (isFocusPlant && isReliable) {
       if (typeof PLANT_DATA !== "undefined") {
         const plant = PLANT_DATA[detectedPlantId];
@@ -679,7 +683,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       // Non-target (tanaman-herbal) ATAU target tapi akurasi rendah (< 80%), tampilkan sebagai "Tanaman Herbal" saja
       if (resPlantName) resPlantName.innerText = "Tanaman Herbal";
-      if (resPlantLatin) resPlantLatin.innerText = "";
+      if (resPlantLatin) resPlantLatin.innerText = "Di luar 4 fokus utama riset";
       if (resAccuracyVal) resAccuracyVal.innerText = `${confidence}%`;
     }
     
@@ -942,7 +946,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         } else if (detectedClass === "unknown") {
           removeBotTypingIndicator();
-          appendChatMessage("bot", "Maaf, gambar yang Anda unggah bukan tanaman herbal target kami atau tidak teridentifikasi. Coba pastikan foto daun berada di tengah.");
+          appendChatMessage("bot", "**Hasil Klasifikasi CNN:** Gambar Tidak Dikenal (0.0%)\n\nMaaf Sobat, gambar yang kamu unggah terdeteksi sebagai objek non-tanaman herbal. PapuaBot hanya dapat merespons seputar tanaman herbal Papua Barat Daya. Cobalah unggah foto daun yang lebih jelas ya! 🍃");
           return;
         } else {
           // Jika kelasnya adalah salah satu dari 4 tanaman fokus riset utama
@@ -1174,7 +1178,7 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       appendChatMessage("bot", htmlContent);
     } else if (detectedPlantId === "unknown") {
-      appendChatMessage("bot", "Maaf, gambar yang Anda unggah **bukan tanaman herbal Papua** target kami atau tidak teridentifikasi. Coba pastikan foto daun berada di tengah.");
+      appendChatMessage("bot", "**Hasil Klasifikasi CNN:** Gambar Tidak Dikenal (0.0%)\n\nMaaf Sobat, gambar yang kamu unggah terdeteksi sebagai objek non-tanaman herbal. PapuaBot hanya dapat merespons seputar tanaman herbal Papua Barat Daya. Cobalah unggah foto daun yang lebih jelas ya! 🍃");
     } else {
       if (typeof PLANT_DATA !== "undefined" && PLANT_DATA[detectedPlantId]) {
         const plant = PLANT_DATA[detectedPlantId];

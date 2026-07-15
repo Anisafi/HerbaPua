@@ -144,9 +144,9 @@ def call_gemini_api(api_keys, message, image_data_url=None, local_prediction=Non
             use_image = True
         elif local_class == "unknown":
             local_guidance = (
-                f"Model CNN mendeteksi gambar sebagai: Tanaman Tidak Dikenal (Akurasi: 0.0%).\n\n"
+                f"Model CNN mendeteksi gambar sebagai: Gambar Tidak Dikenal (Akurasi: 0.0%).\n\n"
                 f"Tugas Anda:\n"
-                f"- Sampaikan secara ramah kepada pengguna bahwa gambar tersebut tidak terdeteksi sebagai salah satu dari 4 tanaman herbal target aplikasi.\n"
+                f"- Sampaikan secara ramah kepada pengguna bahwa gambar tersebut terdeteksi sebagai objek non-tanaman herbal.\n"
                 f"- Minta mereka untuk mengambil foto ulang dengan lebih jelas, fokus, dan dekat pada helai daun tanaman obat."
             )
             use_image = False
@@ -234,7 +234,7 @@ def call_gemini_api(api_keys, message, image_data_url=None, local_prediction=Non
                                 disp_name = plant_display_names[local_class]
                                 reply_text = f"**Hasil Klasifikasi CNN:** {disp_name} ({local_conf}%)\n\n" + reply_text
                             elif local_class == "unknown":
-                                reply_text = f"**Hasil Klasifikasi CNN:** Tanaman Tidak Dikenal\n\n" + reply_text
+                                reply_text = f"**Hasil Klasifikasi CNN:** Gambar Tidak Dikenal\n\n" + reply_text
                                 
                         return {"reply": reply_text}
                 return {"reply": "Maaf, tidak ada respon dari AI."}
