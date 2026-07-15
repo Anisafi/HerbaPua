@@ -681,10 +681,18 @@ document.addEventListener("DOMContentLoaded", () => {
         if (tabUsage) tabUsage.innerText = plant.usage;
       }
     } else {
-      // Non-target (tanaman-herbal) ATAU target tapi akurasi rendah (< 80%), tampilkan sebagai "Tanaman Herbal" saja
-      if (resPlantName) resPlantName.innerText = "Tanaman Herbal";
-      if (resPlantLatin) resPlantLatin.innerText = "Di luar 4 fokus utama riset";
-      if (resAccuracyVal) resAccuracyVal.innerText = `${confidence}%`;
+      // Jika akurasi sangat rendah (< 65%), kemungkinan besar adalah gambar acak / benda mati
+      if (confidence < 65) {
+        if (resPlantName) resPlantName.innerText = "Gambar Tidak Dikenal";
+        if (resPlantLatin) resPlantLatin.innerText = "Bukan Tanaman Herbal";
+        if (resAccuracyVal) resAccuracyVal.innerText = "0%";
+        confidence = 0;
+      } else {
+        // Jika akurasi sedang (65% - 79%), tampilkan sebagai "Tanaman Herbal" umum
+        if (resPlantName) resPlantName.innerText = "Tanaman Herbal";
+        if (resPlantLatin) resPlantLatin.innerText = "Di luar 4 fokus utama riset";
+        if (resAccuracyVal) resAccuracyVal.innerText = `${confidence}%`;
+      }
     }
     
     // Tampilkan/Sembunyikan panel tabs (Deskripsi, Khasiat, Pengolahan)
