@@ -217,6 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderEncyclopedia();
 
   // Modal Detail Tanaman
+  // Modal Detail Tanaman
   function openPlantModal(plant) {
     if (!plantDetailModal) return;
     const modalImg = document.getElementById("modal-img");
@@ -226,11 +227,56 @@ document.addEventListener("DOMContentLoaded", () => {
     const modalDesc = document.getElementById("modal-desc");
     const modalUsage = document.getElementById("modal-usage");
     const benefitsList = document.getElementById("modal-benefits");
+    
+    const headerImgContainer = document.querySelector(".modal-header-img");
+    const closeBtn = document.getElementById("modal-close-btn");
+    const localLabel = document.querySelector(".meta-item span");
+    const sections = document.querySelectorAll(".modal-section h4");
 
-    if (modalImg) {
-      modalImg.src = plant.sampleImage || "";
-      modalImg.style.objectPosition = plant.id === "buah-merah" ? "top" : "center";
+    if (plant.sampleImage) {
+      if (headerImgContainer) {
+        headerImgContainer.style.height = "210px";
+        headerImgContainer.style.backgroundColor = "#f1f5f9";
+      }
+      if (modalImg) {
+        modalImg.style.display = "block";
+        modalImg.src = plant.sampleImage;
+        modalImg.style.objectPosition = plant.id === "buah-merah" ? "top" : "center";
+      }
+      if (closeBtn) {
+        closeBtn.style.color = "#0f172a";
+        closeBtn.style.background = "rgba(255, 255, 255, 0.85)";
+      }
+    } else {
+      if (headerImgContainer) {
+        headerImgContainer.style.height = "40px";
+        headerImgContainer.style.backgroundColor = "transparent";
+      }
+      if (modalImg) {
+        modalImg.style.display = "none";
+      }
+      if (closeBtn) {
+        closeBtn.style.color = "#475569";
+        closeBtn.style.background = "transparent";
+      }
     }
+
+    if (plant.isAbout) {
+      if (localLabel) localLabel.innerText = "Kategori";
+      if (sections.length >= 3) {
+        sections[0].innerText = "Tentang Aplikasi";
+        sections[1].innerText = "Petunjuk Penggunaan Fitur";
+        sections[2].innerText = "Tips Pemindaian & Disclaimer";
+      }
+    } else {
+      if (localLabel) localLabel.innerText = "Nama Lokal / Daerah";
+      if (sections.length >= 3) {
+        sections[0].innerText = "Deskripsi Botani";
+        sections[1].innerText = "Khasiat & Manfaat Kesehatan";
+        sections[2].innerText = "Cara Penggunaan / Pengolahan";
+      }
+    }
+
     if (modalTitle) modalTitle.innerText = plant.name;
     if (modalLatin) modalLatin.innerText = plant.latin;
     if (modalLocal) modalLocal.innerText = plant.localName;
@@ -260,19 +306,20 @@ document.addEventListener("DOMContentLoaded", () => {
     openAboutBtn.addEventListener("click", () => {
       // Show about Info inside Modal
       const aboutData = {
-        name: "HerbaPua AI v1.0",
-        latin: "Sistem Informasi & Klasifikasi Tanaman Obat Tradisional Papua",
-        localName: "Kearifan Lokal Suku Papua",
+        isAbout: true,
+        name: "Panduan Penggunaan Website",
+        latin: "Petunjuk Pengoperasian Fitur Utama HerbaPua",
+        localName: "Sistem Klasifikasi & Edukasi Herbal",
         modelConfidence: null,
-        sampleImage: "https://unimuda.ac.id/front/logo/logo-unimuda.png",
-        description: "Aplikasi HerbaPua merupakan platform digital terpadu untuk melestarikan resep dan pengetahuan pengobatan tradisional 250+ suku asli di Papua. Sistem ini didukung oleh kecerdasan buatan berbasis deep learning (MobileNetV2) untuk melakukan klasifikasi visual serta ensiklopedia botani lengkap berdasarkan data Dinas Kesehatan Provinsi Papua (2016).",
+        sampleImage: "",
+        description: "Aplikasi HerbaPua merupakan platform digital terpadu untuk melestarikan resep dan pengetahuan pengobatan tradisional khas Papua Barat Daya. Sistem ini didukung oleh kecerdasan buatan berbasis deep learning (MobileNetV2 & Gemini API) untuk klasifikasi tanaman obat serta ensiklopedia botani digital yang informatif.",
         benefits: [
-          "Mencegah punahnya pengetahuan pengobatan etnobotani lisan suku-suku Papua.",
-          "Membantu identifikasi visual secara instan menggunakan kamera HP.",
-          "Menyediakan data kandungan senyawa kimia dan aktivitas farmakologi lengkap.",
-          "Sarana pembelajaran praktis tentang keanekaragaman hayati Papua."
+          "Beranda & Pencarian: Cari nama tanaman herbal di kolom pencarian Beranda. Klik kartu tanaman untuk membaca khasiat, senyawa, dan pengolahan.",
+          "Fitur Pindai (Scan): Klik menu 'Pindai' di atas, izinkan akses kamera, lalu posisikan daun tanaman di tengah bingkai dan klik ikon kamera untuk mendeteksi. Anda juga bisa mengunggah file foto dari galeri Anda.",
+          "PapuaBot (Chatbot AI): Klik menu 'Konsultasi' untuk berkonsultasi seputar resep herbal Papua Barat Daya atau mengunggah gambar tanaman untuk dianalisis oleh chatbot AI.",
+          "Sistem Klasifikasi Cerdas: Sistem dapat membedakan 4 tanaman herbal utama riset (Daun Gedi, Daun Gatal, Buah Merah, Sarang Semut), tanaman herbal umum (label: Tanaman Herbal), serta menolak objek mati/gambar acak (label: Gambar Tidak Dikenal)."
         ],
-        usage: "Pilih tab 'Pindai' untuk memotret daun tanaman obat menggunakan kamera, atau cari nama tanaman pada kotak pencarian di halaman Beranda. Anda juga bisa berkonsultasi secara interaktif melalui chatbot di menu 'Konsultasi'."
+        usage: "Untuk hasil pemindaian terbaik, pastikan foto daun diambil dengan cahaya yang cukup, fokus yang tajam, dan helai daun terlihat jelas. Selalu konsultasikan penggunaan ramuan herbal dengan dokter atau tenaga medis profesional."
       };
       openPlantModal(aboutData);
     });
